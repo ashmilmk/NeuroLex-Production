@@ -1,6 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Progress = require('../models/Progress');
+const GameResult = require('../models/GameResult');
 const User = require('../models/User');
 const { auth, authorize } = require('../middleware/auth');
 
@@ -89,12 +90,12 @@ router.post('/session', [
     if (user) {
       user.progress.totalSessions += 1;
       user.progress.completedExercises += 1;
-      
+
       // Calculate new average score
       const totalSessions = user.progress.totalSessions;
       const currentAverage = user.progress.averageScore;
       user.progress.averageScore = ((currentAverage * (totalSessions - 1)) + score) / totalSessions;
-      
+
       user.progress.lastActive = new Date();
       await user.save();
     }
@@ -107,7 +108,7 @@ router.post('/session', [
 
   } catch (error) {
     console.error('Save progress error:', error);
-    
+
     if (error.code === 11000) {
       return res.status(400).json({
         status: 'error',
@@ -342,8 +343,8 @@ router.get('/student/:studentId', [auth, authorize('teacher', 'admin')], async (
       userId: studentId,
       createdAt: { $gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) }
     })
-    .sort({ createdAt: -1 })
-    .limit(10);
+      .sort({ createdAt: -1 })
+      .limit(10);
 
     res.json({
       status: 'success',
@@ -361,9 +362,204 @@ router.get('/student/:studentId', [auth, authorize('teacher', 'admin')], async (
   }
 });
 
+// ===== Game Result Routes =====
+
+// @route   POST /api/progress/game-result
+// @desc    Save a game assessment result
+// @access  Private
+router.post('/game-result', auth, async (req, res) => {
+  try {
+    const {
+      playerName, ageGroup, score, totalPossible, percentage,
+      challengesCompleted, totalTime, talentScores, disorders, studentId
+    } = req.body;
+
+    if (!playerName || !ageGroup) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'playerName and ageGroup are required'
+      });
+    }
+
+    const gameResult = new GameResult({
+      studentId: studentId || '',
+      playerName,
+      ageGroup,
+      score: score || 0,
+      totalPossible: totalPossible || 0,
+      percentage: percentage || 0,
+      challengesCompleted: challengesCompleted || 0,
+      totalTime: totalTime || 0,
+      talentScores: talentScores || {},
+      disorders: disorders || []
+    });
+
+    await gameResult.save();
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Game result saved successfully',
+      gameResult
+    });
+  } catch (error) {
+    console.error('Save game result error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error'
+    });
+  }
+});
+
+// ===== Assessment Result Routes (consultant-run sessions) =====
+const AssessmentResult = require('../models/AssessmentResult');
+
+// @route   POST /api/progress/assessment-result
+// @desc    Save a consultant-run assessment result (separate collection)
+// @access  Private
+router.post('/assessment-result', auth, async (req, res) => {
+  try {
+    const {
+      playerName, ageGroup, score, totalPossible, percentage,
+      challengesCompleted, totalTime, talentScores, disorders,
+      studentId, consultantId
+    } = req.body;
+
+    if (!playerName || !ageGroup) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'playerName and ageGroup are required'
+      });
+    }
+
+    const assessmentResult = new AssessmentResult({
+      consultantId: consultantId || req.user.userId,
+      studentId: studentId || '',
+      playerName,
+      ageGroup,
+      score: score || 0,
+      totalPossible: totalPossible || 0,
+      percentage: percentage || 0,
+      challengesCompleted: challengesCompleted || 0,
+      totalTime: totalTime || 0,
+      talentScores: talentScores || {},
+      disorders: disorders || []
+    });
+
+    await assessmentResult.save();
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Assessment result saved successfully',
+      assessmentResult
+    });
+  } catch (error) {
+    console.error('Save assessment result error:', error);
+    res.status(500).json({ status: 'error', message: 'Server error' });
+  }
+});
+
+// @route   GET /api/progress/assessment-results
+// @desc    Get all assessment results for the logged-in consultant
+// @access  Private (Teachers/Admin)
+router.get('/assessment-results', auth, async (req, res) => {
+  try {
+    const filter = req.user.role === 'admin'
+      ? {}
+      : { consultantId: req.user.userId };
+
+    const results = await AssessmentResult.find(filter)
+      .sort({ createdAt: -1 });
+
+    res.json({ status: 'success', results });
+  } catch (error) {
+    console.error('Get assessment results error:', error);
+    res.status(500).json({ status: 'error', message: 'Server error' });
+  }
+});
+
+// @route   GET /api/progress/assessment-results/student/:studentId
+// @desc    Get assessment results for a specific student
+// @access  Private
+router.get('/assessment-results/student/:studentId', auth, async (req, res) => {
+  try {
+    const results = await AssessmentResult.find({ studentId: req.params.studentId })
+      .sort({ createdAt: -1 });
+
+    res.json({ status: 'success', results });
+  } catch (error) {
+    console.error('Get student assessment results error:', error);
+    res.status(500).json({ status: 'error', message: 'Server error' });
+  }
+});
+
+// @route   GET /api/progress/game-results/:studentId
+// @desc    Get game results by studentId
+// @access  Private
+router.get('/game-results/:studentId', auth, async (req, res) => {
+  try {
+    const results = await GameResult.find({ studentId: req.params.studentId })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      status: 'success',
+      results
+    });
+  } catch (error) {
+    console.error('Get game results error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   GET /api/progress/game-results-by-name/:playerName
+// @desc    Get game results by player name
+// @access  Private
+router.get('/game-results-by-name/:playerName', auth, async (req, res) => {
+  try {
+    const playerName = decodeURIComponent(req.params.playerName);
+    const results = await GameResult.find({ playerName })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      status: 'success',
+      results
+    });
+  } catch (error) {
+    console.error('Get game results by name error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   DELETE /api/progress/game-result/:id
+// @desc    Delete a specific game result
+// @access  Private
+router.delete('/game-result/:id', auth, async (req, res) => {
+  try {
+    const result = await GameResult.findByIdAndDelete(req.params.id);
+    if (!result) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Game result not found'
+      });
+    }
+
+    res.json({
+      status: 'success',
+      message: 'Game result deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete game result error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error'
+    });
+  }
+});
+
 module.exports = router;
-
-
-
-
 

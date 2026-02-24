@@ -141,11 +141,15 @@ router.get('/students', [auth, authorize('teacher', 'admin')], async (req, res) 
     const { page = 1, limit = 10, search = '' } = req.query;
     const skip = (page - 1) * limit;
 
-    // Build search query
+    // Build search query — scope to this consultant unless admin
     const searchQuery = {
       role: 'student',
       isActive: true
     };
+
+    if (req.user.role !== 'admin') {
+      searchQuery.createdBy = req.user.userId;
+    }
 
     if (search) {
       searchQuery.$or = [
@@ -187,9 +191,11 @@ router.get('/students', [auth, authorize('teacher', 'admin')], async (req, res) 
 // @access  Private (Teachers only)
 router.get('/students/:id', [auth, authorize('teacher', 'admin')], async (req, res) => {
   try {
+    const ownerFilter = req.user.role !== 'admin' ? { createdBy: req.user.userId } : {};
     const student = await User.findOne({
       _id: req.params.id,
-      role: 'student'
+      role: 'student',
+      ...ownerFilter
     }).select('-password');
 
     if (!student) {
@@ -277,7 +283,7 @@ router.post('/students', [
   body('firstName').trim().isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
   body('lastName').trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
   body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
-  body('studentId').trim().notEmpty().withMessage('Student ID is required'),
+  body('studentId').optional().trim(),
   body('password').optional().isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
   body('grade').optional().trim(),
   body('severity').optional().isIn(['mild', 'moderate', 'severe']),
@@ -310,13 +316,28 @@ router.post('/students', [
       });
     }
 
-    // Check if studentId already exists
-    const existingStudentId = await User.findOne({ studentId });
-    if (existingStudentId) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Student ID already in use'
-      });
+    // Auto-generate studentId if not provided, always guarantee uniqueness
+    let finalStudentId = studentId;
+    if (!finalStudentId) {
+      // Find the highest existing STU number and increment
+      let unique = false;
+      while (!unique) {
+        const allIds = await User.find({ role: 'student', studentId: /^STU\d+$/ }, 'studentId').lean();
+        const nums = allIds.map(u => parseInt(u.studentId.replace('STU', ''))).filter(n => !isNaN(n));
+        const next = (nums.length ? Math.max(...nums) : 0) + 1;
+        finalStudentId = `STU${String(next).padStart(3, '0')}`;
+        const conflict = await User.findOne({ studentId: finalStudentId });
+        if (!conflict) unique = true;
+      }
+    } else {
+      // Provided — still check for conflict
+      const existingStudentId = await User.findOne({ studentId: finalStudentId });
+      if (existingStudentId) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Student ID already in use'
+        });
+      }
     }
 
     // Create student with default password if not provided
@@ -324,7 +345,7 @@ router.post('/students', [
       firstName,
       lastName,
       email,
-      studentId,
+      studentId: finalStudentId,
       password: password || 'Student@123', // Default password
       role: 'student',
       grade: grade || '',
@@ -393,9 +414,11 @@ router.put('/students/:id', [
       });
     }
 
+    const ownerFilter = req.user.role !== 'admin' ? { createdBy: req.user.userId } : {};
     const student = await User.findOne({
       _id: req.params.id,
-      role: 'student'
+      role: 'student',
+      ...ownerFilter
     });
 
     if (!student) {
@@ -504,9 +527,11 @@ router.post('/students/:id/assign-test', [
 // @access  Private (Teachers only)
 router.delete('/students/:id', [auth, authorize('teacher', 'admin')], async (req, res) => {
   try {
+    const ownerFilter = req.user.role !== 'admin' ? { createdBy: req.user.userId } : {};
     const student = await User.findOne({
       _id: req.params.id,
-      role: 'student'
+      role: 'student',
+      ...ownerFilter
     });
 
     if (!student) {
@@ -540,8 +565,9 @@ router.get('/analytics', [auth, authorize('teacher', 'admin')], async (req, res)
   try {
     const Progress = require('../models/Progress');
 
-    // Get all students with details
-    const allStudents = await User.find({ role: 'student', isActive: true })
+    // Get all students with details — scope to this consultant unless admin
+    const ownerMatch = req.user.role !== 'admin' ? { createdBy: require('mongoose').Types.ObjectId.createFromHexString(req.user.userId) } : {};
+    const allStudents = await User.find({ role: 'student', isActive: true, ...ownerMatch })
       .select('-password')
       .sort({ createdAt: -1 });
 
@@ -550,13 +576,13 @@ router.get('/analytics', [auth, authorize('teacher', 'admin')], async (req, res)
 
     // Get students by dyslexia type
     const dyslexiaStats = await User.aggregate([
-      { $match: { role: 'student', isActive: true } },
+      { $match: { role: 'student', isActive: true, ...ownerMatch } },
       { $group: { _id: '$learningProfile.dyslexiaType', count: { $sum: 1 } } }
     ]);
 
     // Get students by severity
     const severityStats = await User.aggregate([
-      { $match: { role: 'student', isActive: true, 'learningProfile.dyslexiaType': { $ne: 'none' } } },
+      { $match: { role: 'student', isActive: true, 'learningProfile.dyslexiaType': { $ne: 'none' }, ...ownerMatch } },
       { $group: { _id: '$learningProfile.severity', count: { $sum: 1 } } }
     ]);
 
@@ -566,7 +592,8 @@ router.get('/analytics', [auth, authorize('teacher', 'admin')], async (req, res)
     const activeStudents = await User.countDocuments({
       role: 'student',
       isActive: true,
-      'progress.lastActive': { $gte: weekAgo }
+      'progress.lastActive': { $gte: weekAgo },
+      ...ownerMatch
     });
 
     // Format dyslexia stats

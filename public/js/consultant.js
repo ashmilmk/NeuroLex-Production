@@ -36,7 +36,7 @@ function getUserInfo() {
     if (nameEl) nameEl.textContent = userName;
 
     const consultantId = localStorage.getItem('consultantId') || 'Unknown';
-    const idEl = document.getElementById('consultantIdDisplay');
+    const idEl = document.getElementById('consultantIdText') || document.getElementById('consultantIdDisplay');
     if (idEl) idEl.textContent = consultantId;
 }
 
@@ -80,7 +80,7 @@ function updateDyslexiaDistribution(breakdown) {
     };
     Object.keys(labels).forEach(key => {
         const el = document.getElementById(labels[key]);
-        if (el) el.textContent = `${breakdown[key] || 0} students`;
+        if (el) el.textContent = breakdown[key] || 0;
     });
 }
 
@@ -147,7 +147,7 @@ let supportPollInterval;
 let analyticsCharts = {};
 let dashboardCharts = {};
 
-function openAddStudentModal() {
+async function openAddStudentModal() {
     editingStudentId = null;
     const title = document.getElementById('modalTitle');
     const btn = document.getElementById('submitBtn');
@@ -156,7 +156,22 @@ function openAddStudentModal() {
     if (btn) btn.textContent = 'Add Student';
     if (form) form.reset();
 
-    ['email', 'studentIdInput'].forEach(id => {
+    // Auto-generate a unique student ID
+    const idInput = document.getElementById('studentIdInput');
+    if (idInput) {
+        idInput.value = 'Generating…';
+        idInput.readOnly = true;
+        idInput.style.background = '#f3f4f6';
+        idInput.style.color = '#6b7280';
+        try {
+            const newId = await generateUniqueStudentId();
+            idInput.value = newId;
+        } catch (e) {
+            idInput.value = `STU${String(Date.now()).slice(-6)}`;
+        }
+    }
+
+    ['email'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = false;
     });
@@ -169,6 +184,14 @@ function closeStudentModal() {
     const modal = document.getElementById('studentModal');
     if (modal) modal.classList.remove('active');
     editingStudentId = null;
+    // Reset studentId field state for next open
+    const idInput = document.getElementById('studentIdInput');
+    if (idInput) {
+        idInput.readOnly = false;
+        idInput.disabled = false;
+        idInput.style.background = '';
+        idInput.style.color = '';
+    }
 }
 
 async function editStudent(id) {
@@ -361,13 +384,11 @@ window.onload = function () {
                 } else if (gradeNum >= 5 && gradeNum <= 6) {
                     gradeGroup = 'grade56';
                 }
+                localStorage.setItem('consultantSession', 'true');
+                localStorage.setItem('consultantStudentId', id); // student's MongoDB _id
                 window.location.href = `game/index.html?name=${encodeURIComponent(name)}&grade=${gradeGroup}`;
             }
-            else if (action === 'view-results') {
-                // Navigate to progress page with student name filter
-                localStorage.setItem('userName', name);
-                window.location.href = 'progress.html';
-            }
+            else if (action === 'view-results') openAssessmentResultsModal(id, name);
             else if (action === 'edit') editStudent(id);
             else if (action === 'test') window.location.href = `game/index.html?student=${id}&name=${encodeURIComponent(name)}`;
             else if (action === 'delete') deleteStudent(id, name);
@@ -618,3 +639,135 @@ async function generateUniqueStudentId() {
         return `STU${String(Date.now()).slice(-6)}`;
     }
 }
+
+// ===== Assessment Results Modal =====
+function closeAssessmentResultsModal() {
+    const modal = document.getElementById('assessmentResultsModal');
+    if (modal) modal.classList.remove('active');
+}
+
+async function openAssessmentResultsModal(studentId, studentName) {
+    const modal = document.getElementById('assessmentResultsModal');
+    const loading = document.getElementById('arLoading');
+    const empty = document.getElementById('arEmpty');
+    const content = document.getElementById('arContent');
+    const subtitle = document.getElementById('arModalSubtitle');
+
+    if (!modal) return;
+
+    // Reset state
+    if (subtitle) subtitle.textContent = studentName || '';
+    if (loading) { loading.style.display = 'block'; }
+    if (empty) { empty.style.display = 'none'; }
+    if (content) { content.style.display = 'none'; }
+    modal.classList.add('active');
+
+    try {
+        const data = await apiRequest(`/progress/assessment-results/student/${studentId}`);
+        const results = data.results || [];
+
+        if (loading) loading.style.display = 'none';
+
+        if (results.length === 0) {
+            if (empty) empty.style.display = 'block';
+            return;
+        }
+
+        if (content) content.style.display = 'block';
+        const latest = results[0];
+
+        // --- Summary cards (latest) ---
+        const cardsEl = document.getElementById('arLatestCards');
+        if (cardsEl) {
+            const pctColor = latest.percentage >= 70 ? '#10b981' : latest.percentage >= 40 ? '#f59e0b' : '#ef4444';
+            cardsEl.innerHTML = `
+                <div style="background:#f9fafb;border-radius:12px;padding:1rem;text-align:center;border:1px solid #e5e7eb;">
+                    <div style="font-size:1.8rem;font-weight:700;color:${pctColor};">${latest.percentage}%</div>
+                    <div style="font-size:0.78rem;color:#6b7280;margin-top:4px;">Overall Score</div>
+                </div>
+                <div style="background:#f9fafb;border-radius:12px;padding:1rem;text-align:center;border:1px solid #e5e7eb;">
+                    <div style="font-size:1.8rem;font-weight:700;color:#7c3aed;">${latest.score}<span style="font-size:1rem;color:#9ca3af;">/${latest.totalPossible}</span></div>
+                    <div style="font-size:0.78rem;color:#6b7280;margin-top:4px;">Points</div>
+                </div>
+                <div style="background:#f9fafb;border-radius:12px;padding:1rem;text-align:center;border:1px solid #e5e7eb;">
+                    <div style="font-size:1.8rem;font-weight:700;color:#2563eb;">${latest.challengesCompleted}</div>
+                    <div style="font-size:0.78rem;color:#6b7280;margin-top:4px;">Challenges Done</div>
+                </div>`;
+        }
+
+        // --- Disorders ---
+        const disordersEl = document.getElementById('arDisorders');
+        const disordersSection = document.getElementById('arDisordersSection');
+        if (disordersEl && disordersSection) {
+            const disorders = latest.disorders || [];
+            if (disorders.length === 0) {
+                disordersSection.style.display = 'none';
+            } else {
+                disordersSection.style.display = 'block';
+                disordersEl.innerHTML = disorders.map(d => {
+                    const sColor = d.severity === 'High' ? '#ef4444' : '#f59e0b';
+                    return `<div style="background:${sColor}18;border:1px solid ${sColor}40;border-radius:10px;padding:0.6rem 1rem;display:flex;align-items:center;gap:0.5rem;">
+                        <span style="font-size:1.2rem;">${d.icon || '⚠️'}</span>
+                        <div>
+                            <div style="font-weight:600;font-size:0.85rem;color:#374151;">${d.name}</div>
+                            <div style="font-size:0.75rem;color:#6b7280;">${d.severity} risk · ${d.percentage}% score</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        }
+
+        // --- Talent score bars ---
+        const barsEl = document.getElementById('arTalentBars');
+        if (barsEl) {
+            const ts = latest.talentScores || {};
+            const barColors = { creativity: '#8b5cf6', logic: '#2563eb', memory: '#10b981', observation: '#f59e0b', problemSolving: '#ef4444', dyscalculia: '#06b6d4', dysphasia: '#ec4899', dysgraphia: '#f97316' };
+            barsEl.innerHTML = Object.entries(ts).map(([key, val]) => {
+                const maxVal = 100;
+                const pct = Math.min(100, Math.round((val / maxVal) * 100));
+                const color = barColors[key] || '#7c3aed';
+                const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+                return `<div style="margin-bottom:0.5rem;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:#374151;margin-bottom:3px;">
+                        <span>${label}</span><span style="font-weight:600;">${val.toFixed(1)}</span>
+                    </div>
+                    <div style="background:#e5e7eb;border-radius:99px;height:7px;">
+                        <div style="width:${pct}%;background:${color};border-radius:99px;height:100%;transition:width 0.4s;"></div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- History table ---
+        const historyEl = document.getElementById('arHistoryBody');
+        if (historyEl) {
+            const gradeLabels = { grade12: 'Grade 1-2', grade34: 'Grade 3-4', grade56: 'Grade 5-6' };
+            historyEl.innerHTML = results.map((r, i) => {
+                const date = new Date(r.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                const pctColor = r.percentage >= 70 ? '#10b981' : r.percentage >= 40 ? '#f59e0b' : '#ef4444';
+                const disorderNames = (r.disorders || []).map(d => d.name).join(', ') || '—';
+                const rowBg = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+                return `<tr style="background:${rowBg};border-bottom:1px solid #e5e7eb;">
+                    <td style="padding:0.6rem 0.8rem;color:#374151;">${date}</td>
+                    <td style="padding:0.6rem 0.8rem;color:#374151;">${gradeLabels[r.ageGroup] || r.ageGroup}</td>
+                    <td style="padding:0.6rem 0.8rem;text-align:center;font-weight:600;">${r.score}/${r.totalPossible}</td>
+                    <td style="padding:0.6rem 0.8rem;text-align:center;font-weight:700;color:${pctColor};">${r.percentage}%</td>
+                    <td style="padding:0.6rem 0.8rem;text-align:center;font-size:0.8rem;color:#6b7280;">${disorderNames}</td>
+                </tr>`;
+            }).join('');
+        }
+
+    } catch (err) {
+        console.error('Failed to load assessment results:', err);
+        if (loading) loading.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+    }
+}
+
+// Close modal on button click & overlay click
+document.addEventListener('DOMContentLoaded', () => {
+    const closeBtn = document.getElementById('closeArModal');
+    const overlay = document.getElementById('assessmentResultsModal');
+    if (closeBtn) closeBtn.addEventListener('click', closeAssessmentResultsModal);
+    if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) closeAssessmentResultsModal(); });
+});

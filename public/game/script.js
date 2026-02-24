@@ -1126,7 +1126,7 @@ function showResults() {
     }
 }
 
-// Save game results to localStorage
+// Save game results to localStorage and database
 function saveGameResults(totalPossible, percentage, disorders, roundedScore) {
     // Round all talent scores to 1 decimal
     const roundedTalentScores = {};
@@ -1163,7 +1163,61 @@ function saveGameResults(totalPossible, percentage, disorders, roundedScore) {
     // Save back to localStorage
     localStorage.setItem('gameResults', JSON.stringify(existingResults));
 
-    console.log('Game results saved:', gameResult);
+    console.log('Game results saved to localStorage:', gameResult);
+
+    // Also save to database via API
+    const isConsultantSession = localStorage.getItem('consultantSession') === 'true';
+    const consultantStudentId = localStorage.getItem('consultantStudentId') || ''; // student's MongoDB _id
+    // Clear flags immediately after reading
+    localStorage.removeItem('consultantSession');
+    localStorage.removeItem('consultantStudentId');
+
+    const token = localStorage.getItem('token') || localStorage.getItem('studentToken');
+    if (token) {
+        // Choose the correct endpoint — consultant sessions go to the separate collection
+        const endpoint = isConsultantSession
+            ? '/api/progress/assessment-result'
+            : '/api/progress/game-result';
+
+        const apiPayload = {
+            playerName: gameResult.playerName,
+            ageGroup: gameResult.ageGroup,
+            score: gameResult.score,
+            totalPossible: gameResult.totalPossible,
+            percentage: gameResult.percentage,
+            challengesCompleted: gameResult.challengesCompleted,
+            totalTime: gameResult.totalTime,
+            talentScores: gameResult.talentScores,
+            disorders: gameResult.disorders,
+            // For consultant sessions use the student's MongoDB _id; otherwise the logged-in student's displayId
+            studentId: isConsultantSession
+                ? consultantStudentId
+                : (localStorage.getItem('studentId') || '')
+            // consultantId is omitted — the backend uses req.user.userId automatically
+        };
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(apiPayload)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Game results saved to database:', data.gameResult);
+                } else {
+                    console.warn('Failed to save to database:', data.message);
+                }
+            })
+            .catch(err => {
+                console.warn('Could not save to database (offline?):', err);
+            });
+    } else {
+        console.log('No auth token found, skipping database save');
+    }
 }
 
 // Get Talent Display Name

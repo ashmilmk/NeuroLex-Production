@@ -55,6 +55,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  // Ownership — which consultant created this student
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   // Teacher specific fields
   consultantId: {
     type: String,

@@ -77,8 +77,27 @@
                 <div class="dashboard-header">
                     <div class="welcome-text">
                         <h1>Welcome, <span id="userName">Consultant</span></h1>
-                        <p style="color: #6b7280; margin-top: 0.25rem; font-size: 0.9rem;">ID: <span
-                                id="consultantIdDisplay" style="font-weight: 600; color: #7c3aed;">--</span></p>
+                        <div style="margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <div id="consultantIdDisplay" style="
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                                background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+                                color: #ffffff;
+                                font-size: 1rem;
+                                font-weight: 700;
+                                letter-spacing: 0.08em;
+                                padding: 0.45rem 1.1rem;
+                                border-radius: 999px;
+                                box-shadow: 0 4px 14px rgba(124, 58, 237, 0.45);
+                                border: 2px solid rgba(255,255,255,0.25);
+                                text-transform: uppercase;
+                                font-family: 'Courier New', monospace;
+                            ">
+                                <i class="fas fa-id-badge" style="font-size: 0.9rem; opacity: 0.85;"></i>
+                                <span id="consultantIdText">--</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="header-actions">
                         <div class="search-box">
@@ -226,42 +245,86 @@
                                 </div>
                             </div>
                             <div class="widget-content">
-                                <canvas id="dashboardDyslexiaChart" style="max-height: 250px;"></canvas>
+                                <div
+                                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; padding: 0.25rem 0;">
+
+                                    <!-- Dyslexia -->
+                                    <div
+                                        style="display:flex; align-items:center; gap:0.75rem; background: linear-gradient(135deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04)); border:1.5px solid rgba(239,68,68,0.25); border-radius:14px; padding:0.9rem 1rem;">
+                                        <div
+                                            style="width:40px;height:40px;border-radius:10px;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i class="fas fa-book-open" style="color:#ef4444;font-size:1.1rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div
+                                                style="font-size:0.75rem;color:#6b7280;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;">
+                                                Dyslexia</div>
+                                            <div id="countDyslexia"
+                                                style="font-size:1.4rem;font-weight:700;color:#ef4444;line-height:1.2;">
+                                                0</div>
+                                            <div style="font-size:0.7rem;color:#9ca3af;">students</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dysgraphia -->
+                                    <div
+                                        style="display:flex; align-items:center; gap:0.75rem; background: linear-gradient(135deg,rgba(59,130,246,0.12),rgba(59,130,246,0.04)); border:1.5px solid rgba(59,130,246,0.25); border-radius:14px; padding:0.9rem 1rem;">
+                                        <div
+                                            style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i class="fas fa-pen-nib" style="color:#3b82f6;font-size:1.1rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div
+                                                style="font-size:0.75rem;color:#6b7280;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;">
+                                                Dysgraphia</div>
+                                            <div id="countDysgraphia"
+                                                style="font-size:1.4rem;font-weight:700;color:#3b82f6;line-height:1.2;">
+                                                0</div>
+                                            <div style="font-size:0.7rem;color:#9ca3af;">students</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dyscalculia -->
+                                    <div
+                                        style="display:flex; align-items:center; gap:0.75rem; background: linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.04)); border:1.5px solid rgba(245,158,11,0.25); border-radius:14px; padding:0.9rem 1rem;">
+                                        <div
+                                            style="width:40px;height:40px;border-radius:10px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i class="fas fa-calculator" style="color:#f59e0b;font-size:1.1rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div
+                                                style="font-size:0.75rem;color:#6b7280;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;">
+                                                Dyscalculia</div>
+                                            <div id="countDyscalculia"
+                                                style="font-size:1.4rem;font-weight:700;color:#f59e0b;line-height:1.2;">
+                                                0</div>
+                                            <div style="font-size:0.7rem;color:#9ca3af;">students</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dysphasia -->
+                                    <div
+                                        style="display:flex; align-items:center; gap:0.75rem; background: linear-gradient(135deg,rgba(168,85,247,0.12),rgba(168,85,247,0.04)); border:1.5px solid rgba(168,85,247,0.25); border-radius:14px; padding:0.9rem 1rem;">
+                                        <div
+                                            style="width:40px;height:40px;border-radius:10px;background:rgba(168,85,247,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i class="fas fa-comments" style="color:#a855f7;font-size:1.1rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div
+                                                style="font-size:0.75rem;color:#6b7280;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;">
+                                                Dysphasia</div>
+                                            <div id="countDysphasia"
+                                                style="font-size:1.4rem;font-weight:700;color:#a855f7;line-height:1.2;">
+                                                0</div>
+                                            <div style="font-size:0.7rem;color:#9ca3af;">students</div>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Recent Activity Timeline -->
-                        <div class="dashboard-widget">
-                            <div class="widget-header">
-                                <div>
-                                    <h3>Recent Activity</h3>
-                                    <p class="widget-subtitle">Latest updates</p>
-                                </div>
-                                <button class="icon-btn" id="refreshActivity">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                            <div class="widget-content">
-                                <div class="activity-timeline" id="activityTimeline">
-                                    <!-- Populated via JS -->
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Top Performing Students -->
-                        <div class="dashboard-widget">
-                            <div class="widget-header">
-                                <div>
-                                    <h3>Top Performers</h3>
-                                    <p class="widget-subtitle">Best scoring students</p>
-                                </div>
-                            </div>
-                            <div class="widget-content">
-                                <div class="top-performers-list" id="topPerformersList">
-                                    <!-- Populated via JS -->
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Quick Actions -->
                         <div class="dashboard-widget">
@@ -301,21 +364,6 @@
                                         </div>
                                         <span>Support Requests</span>
                                     </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Students Needing Attention -->
-                        <div class="dashboard-widget large">
-                            <div class="widget-header">
-                                <div>
-                                    <h3>Students Needing Attention</h3>
-                                    <p class="widget-subtitle">Require immediate support</p>
-                                </div>
-                            </div>
-                            <div class="widget-content">
-                                <div class="attention-students-list" id="attentionStudentsList">
-                                    <!-- Populated via JS -->
                                 </div>
                             </div>
                         </div>
@@ -797,52 +845,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Dyslexia Distribution -->
-                        <div class="info-card">
-                            <div class="info-card-header">
-                                <h3>Dyslexia Types</h3>
-                                <span class="see-all">See all</span>
-                            </div>
-                            <div class="activity-list" id="dyslexiaDistribution">
-                                <div class="activity-item">
-                                    <div class="activity-avatar" style="background: rgba(239, 68, 68, 0.2);">
-                                        <i class="fas fa-book" style="color: #ef4444;"></i>
-                                    </div>
-                                    <div class="activity-info">
-                                        <h4>Dyslexia</h4>
-                                        <p id="countDyslexia">0 students</p>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-avatar" style="background: rgba(245, 158, 11, 0.2);">
-                                        <i class="fas fa-calculator" style="color: #f59e0b;"></i>
-                                    </div>
-                                    <div class="activity-info">
-                                        <h4>Dyscalculia</h4>
-                                        <p id="countDyscalculia">0 students</p>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-avatar" style="background: rgba(59, 130, 246, 0.2);">
-                                        <i class="fas fa-pen" style="color: #3b82f6;"></i>
-                                    </div>
-                                    <div class="activity-info">
-                                        <h4>Dysgraphia</h4>
-                                        <p id="countDysgraphia">0 students</p>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-avatar" style="background: rgba(168, 85, 247, 0.2);">
-                                        <i class="fas fa-comments" style="color: #a855f7;"></i>
-                                    </div>
-                                    <div class="activity-info">
-                                        <h4>Dysphasia</h4>
-                                        <p id="countDysphasia">0 students</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </main>
@@ -939,6 +941,75 @@
                     <button type="submit" class="btn-submit">Start Adventure Game</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ===== Assessment Results Modal ===== -->
+    <div class="modal-overlay" id="assessmentResultsModal">
+        <div class="modal" style="max-width:750px;width:95%;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title"><i class="fas fa-chart-bar"
+                            style="color:#7c3aed;margin-right:8px;"></i>Assessment Results</h3>
+                    <p id="arModalSubtitle" style="font-size:0.85rem;color:#6b7280;margin:2px 0 0;"></p>
+                </div>
+                <button class="modal-close" id="closeArModal">&times;</button>
+            </div>
+            <div class="modal-body" style="padding:1.5rem;max-height:70vh;overflow-y:auto;">
+                <!-- Loading state -->
+                <div id="arLoading" style="text-align:center;padding:2rem;color:#6b7280;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i>
+                    <p style="margin-top:0.75rem;">Loading results…</p>
+                </div>
+                <!-- Empty state -->
+                <div id="arEmpty" style="display:none;text-align:center;padding:2rem;color:#6b7280;">
+                    <i class="fas fa-clipboard-list" style="font-size:3rem;opacity:0.3;"></i>
+                    <p style="margin-top:0.75rem;font-weight:600;">No assessment results yet</p>
+                    <p style="font-size:0.85rem;">Run an assessment from the student table to see results here.</p>
+                </div>
+                <!-- Results content -->
+                <div id="arContent" style="display:none;">
+                    <h4
+                        style="font-size:0.85rem;text-transform:uppercase;color:#6b7280;letter-spacing:0.05em;margin-bottom:0.75rem;">
+                        Latest Assessment</h4>
+                    <div id="arLatestCards"
+                        style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem;">
+                    </div>
+                    <div id="arDisordersSection">
+                        <h4
+                            style="font-size:0.85rem;text-transform:uppercase;color:#6b7280;letter-spacing:0.05em;margin-bottom:0.75rem;">
+                            Identified Areas</h4>
+                        <div id="arDisorders" style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+                        </div>
+                    </div>
+                    <h4
+                        style="font-size:0.85rem;text-transform:uppercase;color:#6b7280;letter-spacing:0.05em;margin-bottom:0.75rem;">
+                        Talent Scores (Latest)</h4>
+                    <div id="arTalentBars" style="margin-bottom:1.5rem;"></div>
+                    <h4
+                        style="font-size:0.85rem;text-transform:uppercase;color:#6b7280;letter-spacing:0.05em;margin-bottom:0.75rem;">
+                        Assessment History</h4>
+                    <div style="overflow-x:auto;">
+                        <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                            <thead>
+                                <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb;">
+                                    <th style="padding:0.6rem 0.8rem;text-align:left;color:#374151;font-weight:600;">
+                                        Date</th>
+                                    <th style="padding:0.6rem 0.8rem;text-align:left;color:#374151;font-weight:600;">
+                                        Grade Group</th>
+                                    <th style="padding:0.6rem 0.8rem;text-align:center;color:#374151;font-weight:600;">
+                                        Score</th>
+                                    <th style="padding:0.6rem 0.8rem;text-align:center;color:#374151;font-weight:600;">%
+                                    </th>
+                                    <th style="padding:0.6rem 0.8rem;text-align:center;color:#374151;font-weight:600;">
+                                        Disorders</th>
+                                </tr>
+                            </thead>
+                            <tbody id="arHistoryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

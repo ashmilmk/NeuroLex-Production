@@ -1,5 +1,6 @@
-// Simple load results function
-function loadResults() {
+// Progress page - loads results from database with localStorage fallback
+
+async function loadResults() {
     console.log('=== loadResults START ===');
 
     try {
@@ -11,17 +12,7 @@ function loadResults() {
             return;
         }
 
-        const gameResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
         const filterName = localStorage.getItem('userName') || '';
-
-        console.log('gameResults from localStorage:', gameResults);
-        console.log('filterName from localStorage:', filterName);
-        console.log('gameResults length:', gameResults.length);
-
-        if (gameResults.length > 0) {
-            console.log('First result playerName:', gameResults[0].playerName);
-            console.log('Comparison: filterName === gameResults[0].playerName:', filterName === gameResults[0].playerName);
-        }
 
         if (filterName) {
             studentNameDisplay.textContent = `Results for: ${filterName}`;
@@ -29,24 +20,58 @@ function loadResults() {
             studentNameDisplay.textContent = 'All Results';
         }
 
-        // Filter results - show ALL if no filter, otherwise filter by name
-        let filteredResults = gameResults;
-        if (filterName && filterName.length > 0) {
-            filteredResults = gameResults.filter(r => {
-                const match = r.playerName === filterName;
-                console.log(`Checking: "${r.playerName}" === "${filterName}" = ${match}`);
-                return match;
-            });
+        // Try fetching from database first
+        let filteredResults = [];
+        let fromDatabase = false;
+
+        const token = localStorage.getItem('token') || localStorage.getItem('studentToken');
+        if (token && filterName) {
+            try {
+                const res = await fetch(`/api/progress/game-results-by-name/${encodeURIComponent(filterName)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await res.json();
+                if (data.status === 'success' && data.results && data.results.length > 0) {
+                    // Map database results to the expected format
+                    filteredResults = data.results.map(r => ({
+                        _id: r._id,
+                        id: r._id,
+                        date: r.createdAt,
+                        playerName: r.playerName,
+                        ageGroup: r.ageGroup,
+                        score: r.score,
+                        totalPossible: r.totalPossible,
+                        percentage: r.percentage,
+                        talentScores: r.talentScores,
+                        disorders: r.disorders,
+                        challengesCompleted: r.challengesCompleted,
+                        totalTime: r.totalTime
+                    }));
+                    fromDatabase = true;
+                    console.log('Loaded results from database:', filteredResults.length);
+                }
+            } catch (err) {
+                console.warn('Database fetch failed, falling back to localStorage:', err);
+            }
         }
 
-        console.log('filteredResults after filter:', filteredResults);
-        console.log('filteredResults length:', filteredResults.length);
+        // Fallback to localStorage if database fetch returned nothing
+        if (!fromDatabase) {
+            const gameResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+            console.log('Falling back to localStorage, gameResults:', gameResults.length);
+
+            filteredResults = gameResults;
+            if (filterName && filterName.length > 0) {
+                filteredResults = gameResults.filter(r => r.playerName === filterName);
+            }
+        }
 
         // Sort by date descending
         filteredResults.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         if (filteredResults.length === 0) {
-            console.log('No results found');
             resultsContent.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">
@@ -55,9 +80,8 @@ function loadResults() {
                     <div class="empty-state-text">
                         <h3 style="margin-bottom: 0.5rem;">No Results Yet</h3>
                         <p>Complete an assessment to see your progress here.</p>
-                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Debug: Looking for "${filterName}" in ${gameResults.length} results</p>
                     </div>
-                    <button class="btn-back" onclick="goBack()">
+                    <button class="btn-back" data-action="goBack">
                         <i class="fas fa-arrow-left"></i>
                         Back to Students
                     </button>
@@ -81,8 +105,6 @@ function loadResults() {
                 'grade34': 'Grade 3-4',
                 'grade56': 'Grade 5-6'
             }[result.ageGroup] || result.ageGroup;
-
-
 
             const disordersHTML = result.disorders && result.disorders.length > 0
                 ? `
@@ -115,7 +137,7 @@ function loadResults() {
                     </div>
                 `;
 
-            // Round values for display to avoid long decimals
+            // Round values for display
             const displayScore = typeof result.score === 'number' ? Math.round(result.score * 10) / 10 : result.score;
             const displayTotal = typeof result.totalPossible === 'number' ? Math.round(result.totalPossible * 10) / 10 : result.totalPossible;
             const displayPercentage = typeof result.percentage === 'number' ? Math.round(result.percentage) : '0';
@@ -134,17 +156,27 @@ function loadResults() {
                 `;
             }).join('');
 
+            // Delete button - only show if result has a database _id
+            const deleteBtn = result._id
+                ? `<button class="btn-delete-result" data-action="delete" data-result-id="${result._id}" title="Delete this result">
+                       <i class="fas fa-trash"></i> Delete
+                   </button>`
+                : '';
+
             return `
-                <div class="result-card">
+                <div class="result-card" id="result-${result._id || result.id}">
                     <div class="result-header">
                         <div>
                             <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">${result.playerName}</div>
                             <div class="result-date">${date}</div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">${gradeLabel}</div>
                         </div>
-                        <div class="result-score">
-                            <div class="score-value">${displayPercentage}%</div>
-                            <div class="score-label">Score</div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+                            <div class="result-score">
+                                <div class="score-value">${displayPercentage}%</div>
+                                <div class="score-label">Score</div>
+                            </div>
+                            ${deleteBtn}
                         </div>
                     </div>
 
@@ -182,13 +214,75 @@ function loadResults() {
             `;
         }).join('');
 
-        console.log('Setting resultsContent HTML');
         resultsContent.innerHTML = resultsHTML;
+        attachResultsEventListeners();
         console.log('=== loadResults END ===');
     } catch (error) {
         console.error('Error in loadResults:', error);
         document.getElementById('resultsContent').innerHTML = `<div style="color: red; padding: 2rem;">Error: ${error.message}</div>`;
     }
+}
+
+// Delete a game result from the database
+async function deleteResult(resultId) {
+    if (!confirm('Are you sure you want to delete this result?')) return;
+
+    const token = localStorage.getItem('token') || localStorage.getItem('studentToken');
+    if (!token) {
+        alert('You must be logged in to delete results.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/progress/game-result/${resultId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            // Remove the card from DOM with animation
+            const card = document.getElementById(`result-${resultId}`);
+            if (card) {
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(50px)';
+                setTimeout(() => {
+                    card.remove();
+                    // Check if there are no more results
+                    const remaining = document.querySelectorAll('.result-card');
+                    if (remaining.length === 0) {
+                        loadResults(); // Reload to show empty state
+                    }
+                }, 300);
+            }
+        } else {
+            alert('Failed to delete: ' + (data.message || 'Unknown error'));
+        }
+    } catch (err) {
+        console.error('Delete error:', err);
+        alert('Failed to delete result. Please try again.');
+    }
+}
+
+// Attach event listeners to dynamically created buttons (avoids CSP issues with inline onclick)
+function attachResultsEventListeners() {
+    // Delete buttons
+    document.querySelectorAll('[data-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const resultId = this.getAttribute('data-result-id');
+            if (resultId) deleteResult(resultId);
+        });
+    });
+
+    // Go back buttons
+    document.querySelectorAll('[data-action="goBack"]').forEach(btn => {
+        btn.addEventListener('click', function () {
+            goBack();
+        });
+    });
 }
 
 function getTalentDisplayName(talent) {
@@ -234,11 +328,9 @@ function formatTalentName(talent) {
 }
 
 function goBack() {
-    // Try to go back in history if available
     if (window.history.length > 1) {
         window.history.back();
     } else {
-        // Fallback to students page
         window.location.href = 'students.html';
     }
 }
@@ -251,10 +343,8 @@ function setupLogoutButton() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            // Clear session data
             localStorage.removeItem('consultantLoggedIn');
             localStorage.removeItem('consultantEmail');
-            // Redirect to login
             window.location.href = 'login.html';
         });
     }
@@ -271,8 +361,6 @@ function initPage() {
             e.preventDefault();
             goBack();
         });
-    } else {
-        console.warn('Back button not found');
     }
 
     // Set up logout button if present
@@ -282,7 +370,6 @@ function initPage() {
 // Helper to format duration
 function formatDuration(ms, questionCount) {
     if (!ms || typeof ms !== 'number') {
-        // Fallback for old records without time tracking
         return `~${Math.round(questionCount * 2)} min`;
     }
 
@@ -299,6 +386,5 @@ function formatDuration(ms, questionCount) {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initPage);
 } else {
-    // DOM is already loaded
     initPage();
 }
