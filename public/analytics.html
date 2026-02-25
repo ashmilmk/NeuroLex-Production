@@ -4,79 +4,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Consultant Dashboard - Manage students and dyslexia assessments">
-    <title>Analytics - Dyslexia Detection Platform</title>
+    <meta name="description" content="Analytics & Insights - NeuroLex Dyslexia Detection Platform">
+    <title>Analytics - NeuroLex</title>
 
     <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
 
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- External Stylesheets -->
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="css/consultant.css">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* ── Analytics Page Styles ── */
+        .an-page {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Stats Row */
+        .an-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+
+        .an-stat {
+            border-radius: 20px;
+            padding: 1.4rem 1.6rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transition: transform .25s, box-shadow .25s;
+        }
+
+        .an-stat:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+        }
+
+        .an-stat.purple {
+            background: linear-gradient(135deg, #4c1d95, #7c3aed);
+        }
+
+        .an-stat.red {
+            background: linear-gradient(135deg, #b91c1c, #ef4444);
+        }
+
+        .an-stat.blue {
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+        }
+
+        .an-stat.green {
+            background: linear-gradient(135deg, #065f46, #10b981);
+        }
+
+        .an-stat-label {
+            font-size: .78rem;
+            font-weight: 500;
+            opacity: .85;
+            margin-bottom: .3rem;
+        }
+
+        .an-stat-val {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -.5px;
+        }
+
+        .an-stat-bg {
+            position: absolute;
+            right: -14px;
+            bottom: -14px;
+            font-size: 5rem;
+            opacity: .08;
+            pointer-events: none;
+        }
+
+        /* Charts Row */
+        .an-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .an-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.75rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(124, 58, 237, 0.07);
+        }
+
+        .an-card-header {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .an-card-header .icon-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .an-card-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1a1d29;
+            margin: 0;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 260px;
+        }
+
+        /* Student Results Table Card */
+        .an-table-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(124, 58, 237, 0.07);
+        }
+
+        .an-table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem;
+            background: #fafbff;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .an-table-title-group {
+            display: flex;
+            align-items: center;
+            gap: .85rem;
+        }
+
+        .an-table-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #7c3aed, #4c1d95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, .3);
+        }
+
+        .an-table-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1d29;
+            margin: 0 0 .1rem 0;
+        }
+
+        .an-table-sub {
+            font-size: .78rem;
+            color: #9ca3af;
+            margin: 0;
+        }
+
+        /* Student Selector */
+        .an-selector-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background: white;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .an-selector-row label {
+            font-size: .85rem;
+            font-weight: 600;
+            color: #374151;
+            white-space: nowrap;
+        }
+
+        .an-selector-row select {
+            flex: 1;
+            padding: .65rem 1rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: .9rem;
+            color: #1a1d29;
+            background: #fafbff;
+            font-family: inherit;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .an-selector-row select:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, .1);
+        }
+
+        /* Results Table */
+        .an-table-scroll {
+            overflow-x: auto;
+        }
+
+        .an-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .an-table thead tr {
+            background: #fafbff;
+        }
+
+        .an-table th {
+            text-align: left;
+            padding: .9rem 1.25rem;
+            font-size: .73rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            border-bottom: 1px solid #f3f4f6;
+            white-space: nowrap;
+        }
+
+        .an-table td {
+            padding: .9rem 1.25rem;
+            color: #374151;
+            font-size: .88rem;
+            border-bottom: 1px solid #f9fafb;
+            vertical-align: middle;
+        }
+
+        .an-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .an-table tbody tr:hover {
+            background: #faf8ff;
+        }
+
+        /* Score bar */
+        .score-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .score-bar {
+            flex: 1;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width .4s;
+        }
+
+        .score-label {
+            font-size: .78rem;
+            font-weight: 700;
+            min-width: 32px;
+        }
+
+        /* Badges */
+        .an-badge {
+            display: inline-block;
+            padding: .3rem .7rem;
+            border-radius: 50px;
+            font-size: .72rem;
+            font-weight: 600;
+        }
+
+        .an-badge.purple {
+            background: rgba(124, 58, 237, .12);
+            color: #7c3aed;
+        }
+
+        .an-badge.red {
+            background: rgba(239, 68, 68, .1);
+            color: #ef4444;
+        }
+
+        .an-badge.amber {
+            background: rgba(245, 158, 11, .1);
+            color: #d97706;
+        }
+
+        .an-badge.green {
+            background: rgba(16, 185, 129, .1);
+            color: #059669;
+        }
+
+        .an-badge.gray {
+            background: rgba(107, 114, 128, .1);
+            color: #6b7280;
+        }
+
+        .an-badge.blue {
+            background: rgba(59, 130, 246, .1);
+            color: #2563eb;
+        }
+
+        /* Student Profile Card */
+        .an-profile-card {
+            background: linear-gradient(135deg, #3b0764 0%, #6d28d9 50%, #a78bfa 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .an-profile-card::before {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .06);
+            top: -60px;
+            right: -40px;
+        }
+
+        .an-profile-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, .2);
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(6px);
+            border: 1.5px solid rgba(255, 255, 255, .3);
+            flex-shrink: 0;
+        }
+
+        .an-profile-info h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 0 .4rem 0;
+        }
+
+        .an-profile-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            font-size: .85rem;
+            opacity: .85;
+        }
+
+        .an-profile-meta span {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .an-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .an-detail-cell {
+            background: white;
+            border-radius: 14px;
+            padding: 1.25rem;
+            border-left: 4px solid;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+        }
+
+        .an-detail-cell .cell-label {
+            font-size: .78rem;
+            color: #6b7280;
+            margin-bottom: .35rem;
+        }
+
+        .an-detail-cell .cell-val {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a1d29;
+        }
+
+        /* Empty State */
+        .an-empty {
+            text-align: center;
+            padding: 3.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .an-empty-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, .1), rgba(76, 29, 149, .1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #7c3aed;
+        }
+
+        .an-empty h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1d29;
+            margin: 0;
+        }
+
+        .an-empty p {
+            font-size: .85rem;
+            color: #9ca3af;
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media(max-width:1100px) {
+            .an-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .an-charts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:768px) {
+            .an-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .an-detail-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <div class="dashboard-layout">
+
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-logo">
                 <i class="fas fa-brain"></i>
                 <span>NeuroLex</span>
             </div>
-
             <nav class="sidebar-nav">
                 <a class="nav-item" href="consultant-dashboard.html" id="navDashboard">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
+                    <i class="fas fa-th-large"></i><span>Dashboard</span>
                 </a>
                 <a class="nav-item" href="students.html" id="navStudents">
-                    <i class="fas fa-user-graduate"></i>
-                    <span>Students</span>
+                    <i class="fas fa-user-graduate"></i><span>Students</span>
                 </a>
                 <a class="nav-item" href="game/index.html">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Assessments</span>
+                    <i class="fas fa-clipboard-check"></i><span>Assessments</span>
                 </a>
                 <a class="nav-item active" href="analytics.html" id="navAnalytics">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
+                    <i class="fas fa-chart-line"></i><span>Analytics</span>
                 </a>
                 <a class="nav-item" href="resources.html" id="navResources">
-                    <i class="fas fa-book-open"></i>
-                    <span>Resources</span>
+                    <i class="fas fa-book-open"></i><span>Resources</span>
                 </a>
                 <a class="nav-item" href="settings.html" id="navSettings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
+                    <i class="fas fa-cog"></i><span>Settings</span>
                 </a>
                 <a class="nav-item" href="support.html" id="navSupport">
-                    <i class="fas fa-headset"></i>
-                    <span>Support</span>
+                    <i class="fas fa-headset"></i><span>Support</span>
                 </a>
             </nav>
-
             <div class="sidebar-footer">
                 <a class="nav-item" href="#" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
+                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
                 </a>
             </div>
         </aside>
 
-        <!-- Main Content Wrapper -->
+        <!-- Main -->
         <div class="main-wrapper">
             <main class="main-content">
-                <!-- Header -->
+
+                <!-- Page Header -->
                 <div class="dashboard-header">
                     <div class="welcome-text">
-                        <h1>Analytics & Insights</h1>
+                        <h1>Analytics &amp; Insights</h1>
+                        <p style="font-size:.85rem;color:#6b7280;margin:.1rem 0 0;font-weight:400;">Comprehensive view
+                            of student performance and dyslexia data</p>
                     </div>
                     <div class="header-actions">
                         <div class="search-box">
@@ -93,155 +539,584 @@
                     </div>
                 </div>
 
-                <!-- Dashboard Main Section (Hidden) -->
-                <div id="dashboardMainSection" style="display: none;"></div>
+                <!-- Hidden stubs required by consultant.js -->
+                <div id="dashboardMainSection" style="display:none;"></div>
+                <div id="studentsSection" style="display:none;"></div>
+                <div id="supportSection" style="display:none;"></div>
+                <div id="resourcesSection" style="display:none;"></div>
 
-                <!-- Content Grid -->
-                <div class="content-grid">
-                    <!-- Analytics Section -->
-                    <div id="analyticsSection">
-                        <div class="content-header">
-                            <h2>Student Performance Data</h2>
-                            <p class="text-gray">Comprehensive view of assessment results and progress.</p>
+                <!-- Analytics Section -->
+                <div id="analyticsSection" class="an-page">
+
+                    <!-- ── Stats Row ── -->
+                    <div class="an-stats">
+                        <div class="an-stat purple">
+                            <div class="an-stat-label">Total Students</div>
+                            <div class="an-stat-val" id="analyticsTotalStudents">—</div>
+                            <div class="an-stat-bg"><i class="fas fa-users"></i></div>
                         </div>
-
-                        <!-- Student Selector -->
-                        <div
-                            style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 1.5rem;">
-                            <label for="analyticsStudentSelect"
-                                style="display: block; margin-bottom: 0.75rem; font-weight: 600; color: #1a1d29;">Select
-                                Student to View Detailed Analytics:</label>
-                            <select id="analyticsStudentSelect"
-                                style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 1rem; background: white;">
-                                <option value="">-- Select a Student --</option>
-                            </select>
+                        <div class="an-stat red">
+                            <div class="an-stat-label">Need Support</div>
+                            <div class="an-stat-val" id="analyticsNeedingSupport">—</div>
+                            <div class="an-stat-bg"><i class="fas fa-exclamation-triangle"></i></div>
                         </div>
+                        <div class="an-stat blue">
+                            <div class="an-stat-label">Avg Score</div>
+                            <div class="an-stat-val" id="analyticsAvgScore">—</div>
+                            <div class="an-stat-bg"><i class="fas fa-chart-bar"></i></div>
+                        </div>
+                        <div class="an-stat green">
+                            <div class="an-stat-label">Active Students</div>
+                            <div class="an-stat-val" id="analyticsActiveStudents">—</div>
+                            <div class="an-stat-bg"><i class="fas fa-check-circle"></i></div>
+                        </div>
+                    </div>
 
-                        <!-- Student Profile Card (shown when student selected) -->
-                        <div id="studentProfileCard" style="display: none;">
-                            <!-- Student Header -->
-                            <div
-                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 16px; color: white; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-                                <div style="display: flex; align-items: center; gap: 1.5rem;">
-                                    <div id="profileAvatar"
-                                        style="width: 80px; height: 80px; border-radius: 16px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700;">
-                                    </div>
-                                    <div style="flex: 1;">
-                                        <h2 id="profileName" style="font-size: 1.75rem; margin-bottom: 0.5rem;">Student
-                                            Name</h2>
-                                        <div style="display: flex; gap: 2rem; font-size: 0.95rem; opacity: 0.9;">
-                                            <div><i class="fas fa-id-card"></i> ID: <span
-                                                    id="profileStudentId">--</span></div>
-                                            <div><i class="fas fa-graduation-cap"></i> Grade: <span
-                                                    id="profileGrade">--</span></div>
-                                            <div><i class="fas fa-envelope"></i> <span id="profileEmail">--</span></div>
-                                        </div>
-                                    </div>
+                    <!-- ── Charts Row ── -->
+                    <div class="an-charts">
+
+                        <!-- Dyslexia Type Distribution (Pie) -->
+                        <div class="an-card">
+                            <div class="an-card-header">
+                                <div class="icon-badge" style="background:rgba(124,58,237,.1);color:#7c3aed;">
+                                    <i class="fas fa-brain"></i>
                                 </div>
+                                <h3>Dyslexia Type Distribution</h3>
                             </div>
+                            <div class="chart-wrap">
+                                <canvas id="dyslexiaTypeChart"></canvas>
+                            </div>
+                        </div>
 
-                            <!-- Dyslexia Assessment Results -->
-                            <div
-                                style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 1.5rem;">
-                                <h3
-                                    style="margin-bottom: 1.5rem; color: #1a1d29; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i class="fas fa-brain" style="color: #7c3aed;"></i>
-                                    Dyslexia Assessment
-                                </h3>
-                                <div
-                                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                                    <div
-                                        style="padding: 1.25rem; background: #f9fafb; border-radius: 12px; border-left: 4px solid #7c3aed;">
-                                        <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.5rem;">Dyslexia
-                                            Type</div>
-                                        <div id="profileDyslexiaType"
-                                            style="font-size: 1.25rem; font-weight: 600; color: #1a1d29;">--</div>
-                                    </div>
-                                    <div
-                                        style="padding: 1.25rem; background: #f9fafb; border-radius: 12px; border-left: 4px solid #ef4444;">
-                                        <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.5rem;">Severity
-                                            Level</div>
-                                        <div id="profileSeverity"
-                                            style="font-size: 1.25rem; font-weight: 600; color: #1a1d29;">--</div>
-                                    </div>
-                                    <div
-                                        style="padding: 1.25rem; background: #f9fafb; border-radius: 12px; border-left: 4px solid #3b82f6;">
-                                        <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.5rem;">Dyslexia
-                                            Probability</div>
-                                        <div id="profileProbability"
-                                            style="font-size: 1.25rem; font-weight: 600; color: #1a1d29;">--</div>
-                                    </div>
-                                    <div
-                                        style="padding: 1.25rem; background: #f9fafb; border-radius: 12px; border-left: 4px solid #10b981;">
-                                        <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.5rem;">Overall
-                                            Score</div>
-                                        <div id="profileAvgScore"
-                                            style="font-size: 1.25rem; font-weight: 600; color: #1a1d29;">--</div>
-                                    </div>
+                        <!-- Severity Distribution (Pie) -->
+                        <div class="an-card">
+                            <div class="an-card-header">
+                                <div class="icon-badge" style="background:rgba(239,68,68,.08);color:#ef4444;">
+                                    <i class="fas fa-signal"></i>
                                 </div>
+                                <h3>Severity Distribution</h3>
                             </div>
-
-                            <!-- Performance History Chart -->
-                            <div
-                                style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 1.5rem;">
-                                <h3 style="margin-bottom: 1.5rem; color: #1a1d29; font-size: 1.25rem;">
-                                    <i class="fas fa-chart-line" style="color: #10b981;"></i>
-                                    Performance Progress Over Time
-                                </h3>
-                                <canvas id="studentProgressChart" style="max-height: 300px;"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Overview Stats -->
-                        <div class="analytics-stats-grid"
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
-                            <div class="stat-card-analytics"
-                                style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-                                <div style="font-size: 2rem; font-weight: 700; color: #7c3aed;"
-                                    id="analyticsTotalStudents">0</div>
-                                <div style="color: #6b7280; margin-top: 0.5rem;">Total Students</div>
-                            </div>
-                            <div class="stat-card-analytics"
-                                style="background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-                                <div style="font-size: 2rem; font-weight: 700; color: #ef4444;"
-                                    id="analyticsNeedingSupport">0</div>
-                                <div style="color: #6b7280; margin-top: 0.5rem;">Need Support</div>
-                            </div>
-                        </div>
-
-                        <!-- Charts Row -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
-                            <div class="chart-card"
-                                style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-                                <h3 style="margin-bottom: 1.5rem; color: #1a1d29; font-size: 1.25rem;">Dyslexia Type
-                                    Distribution</h3>
-                                <canvas id="dyslexiaTypeChart" style="max-height: 300px;"></canvas>
-                            </div>
-                            <div class="chart-card"
-                                style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-                                <h3 style="margin-bottom: 1.5rem; color: #1a1d29; font-size: 1.25rem;">Severity
-                                    Distribution</h3>
-                                <canvas id="severityChart" style="max-height: 300px;"></canvas>
+                            <div class="chart-wrap">
+                                <canvas id="severityChart"></canvas>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- Hidden Sections -->
-                    <div id="studentsSection" style="display: none;"></div>
-                    <div id="supportSection" style="display: none;"></div>
-                    <div id="resourcesSection" style="display: none;"></div>
-                </div>
+                    <!-- ── Performance Trend Line Chart ── -->
+                    <div class="an-card" style="grid-column: 1 / -1;">
+                        <div class="an-card-header">
+                            <div class="icon-badge" style="background:rgba(124,58,237,.1);color:#7c3aed;">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>Student Performance Trends</h3>
+                            <select id="anTrendFilter"
+                                style="margin-left:auto;padding:.5rem .9rem;border:1.5px solid #e5e7eb;border-radius:8px;font-size:.85rem;color:#374151;background:#fafbff;font-family:inherit;outline:none;">
+                                <option value="7">Last 7 days</option>
+                                <option value="30" selected>Last 30 days</option>
+                                <option value="90">Last 3 months</option>
+                            </select>
+                        </div>
+                        <div style="position:relative;height:320px;">
+                            <canvas id="anPerformanceTrendChart"></canvas>
+                        </div>
+                        <p id="anTrendDemoNote"
+                            style="display:none;text-align:center;font-size:.78rem;color:#9ca3af;margin-top:.5rem;">
+                            ⚡ Showing demo data — add students &amp; run assessments to see real trends
+                        </p>
+                    </div>
+
+                    <!-- ── Student Selector ── -->
+                    <div class="an-selector-row an-card"
+                        style="padding:1.25rem 2rem;gap:1rem;display:flex;align-items:center;">
+                        <i class="fas fa-filter" style="color:#7c3aed;font-size:1rem;"></i>
+                        <label for="analyticsStudentSelect"
+                            style="font-size:.88rem;font-weight:600;color:#374151;white-space:nowrap;">View Student
+                            Profile:</label>
+                        <select id="analyticsStudentSelect"
+                            style="flex:1;padding:.65rem 1rem;border:1.5px solid #e5e7eb;border-radius:10px;font-size:.9rem;color:#1a1d29;background:#fafbff;font-family:inherit;outline:none;">
+                            <option value="">— Select a Student —</option>
+                        </select>
+                    </div>
+
+                    <!-- ── Student Profile Card (hidden until selected) ── -->
+                    <div id="studentProfileCard" style="display:none;" class="an-page">
+
+                        <!-- Profile Banner -->
+                        <div class="an-profile-card">
+                            <div class="an-profile-avatar" id="profileAvatar">—</div>
+                            <div class="an-profile-info">
+                                <h2 id="profileName">Student Name</h2>
+                                <div class="an-profile-meta">
+                                    <span><i class="fas fa-id-badge"></i> ID: <strong
+                                            id="profileStudentId">—</strong></span>
+                                    <span><i class="fas fa-graduation-cap"></i> Grade: <strong
+                                            id="profileGrade">—</strong></span>
+                                    <span><i class="fas fa-envelope"></i> <span id="profileEmail">—</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Detail Cells -->
+                        <div class="an-detail-grid">
+                            <div class="an-detail-cell" style="border-color:#7c3aed;">
+                                <div class="cell-label">Dyslexia Type</div>
+                                <div class="cell-val" id="profileDyslexiaType">—</div>
+                            </div>
+                            <div class="an-detail-cell" style="border-color:#ef4444;">
+                                <div class="cell-label">Severity Level</div>
+                                <div class="cell-val" id="profileSeverity">—</div>
+                            </div>
+                            <div class="an-detail-cell" style="border-color:#3b82f6;">
+                                <div class="cell-label">Dyslexia Probability</div>
+                                <div class="cell-val" id="profileProbability">—</div>
+                            </div>
+                            <div class="an-detail-cell" style="border-color:#10b981;">
+                                <div class="cell-label">Overall Score</div>
+                                <div class="cell-val" id="profileAvgScore">—</div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Chart -->
+                        <div class="an-card">
+                            <div class="an-card-header">
+                                <div class="icon-badge" style="background:rgba(16,185,129,.1);color:#10b981;">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h3>Performance Progress Over Time</h3>
+                            </div>
+                            <div class="chart-wrap">
+                                <canvas id="studentProgressChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ── All Students Results Table ── -->
+                    <div class="an-table-card">
+                        <div class="an-table-header">
+                            <div class="an-table-title-group">
+                                <div class="an-table-icon"><i class="fas fa-table"></i></div>
+                                <div>
+                                    <h3 class="an-table-title">Student Results</h3>
+                                    <p class="an-table-sub">Assessment scores and learning profiles for all students</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Table -->
+                        <div class="an-table-scroll">
+                            <table class="an-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>ID</th>
+                                        <th>Dyslexia Type</th>
+                                        <th>Severity</th>
+                                        <th>Avg Score</th>
+                                        <th>Accuracy</th>
+                                        <th>Sessions</th>
+                                        <th>Last Active</th>
+                                        <th>Profile</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="analyticsStudentTableBody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div class="an-empty" id="analyticsTableEmpty" style="display:none;">
+                            <div class="an-empty-icon"><i class="fas fa-chart-bar"></i></div>
+                            <h3>No Data Available</h3>
+                            <p>Student assessment results will appear here once collected.</p>
+                        </div>
+                    </div>
+
+                </div><!-- /analyticsSection -->
+
             </main>
         </div>
     </div>
 
-    <!-- Modals (Needed for JS consistency) -->
-    <div class="modal-overlay" id="studentModal" style="display:none"></div>
-    <div class="modal-overlay" id="testModal" style="display:none"></div>
+    <!-- Stubs required by consultant.js -->
+    <div class="modal-overlay" id="studentModal" style="display:none;"></div>
+    <div class="modal-overlay" id="testModal" style="display:none;"></div>
 
     <script src="js/student-profile.js"></script>
     <script src="js/consultant.js"></script>
+    <script>
+        /* ── Neutralize consultant.js's loadAnalyticsData (it references missing canvases) ── */
+        /* We will load analytics ourselves via DOMContentLoaded below.                       */
+        window.loadAnalyticsData = function () { /* no-op on analytics.html */ };
+
+        /* Helper: render a pie chart */
+        const _pieCharts = {};
+        function renderPieChart(canvasId, breakdown, meta) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+            if (_pieCharts[canvasId]) _pieCharts[canvasId].destroy();
+
+            const filtered = Object.entries(breakdown).filter(([, v]) => v > 0);
+            if (!filtered.length) {
+                // Show placeholder text
+                ctx.parentElement.innerHTML = '<p style="text-align:center;color:#9ca3af;padding:5rem 1rem;font-size:.9rem;">No data available yet</p>';
+                return;
+            }
+
+            _pieCharts[canvasId] = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: filtered.map(([k]) => meta[k]?.label || k),
+                    datasets: [{ data: filtered.map(([, v]) => v), backgroundColor: filtered.map(([k]) => meta[k]?.color || '#7c3aed'), borderWidth: 2, borderColor: '#fff' }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { padding: 16, font: { size: 12, family: 'Inter' } } },
+                        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} student(s)` } }
+                    }
+                }
+            });
+        }
+
+        /* Helper: severity color */
+        function sevColor(sev) {
+            return ({ mild: '#10b981', moderate: '#f59e0b', severe: '#ef4444' })[sev] || '#6b7280';
+        }
+
+        /* Populate student table */
+        function populateStudentsTable(students) {
+            const tbody = document.getElementById('analyticsStudentTableBody');
+            const empty = document.getElementById('analyticsTableEmpty');
+            if (!tbody) return;
+
+            const typeLabels = { none: 'None', dyslexia: 'Dyslexia', dyscalculia: 'Dyscalculia', dysgraphia: 'Dysgraphia', dysphasia: 'Dysphasia' };
+
+            if (!students.length) {
+                tbody.innerHTML = '';
+                if (empty) empty.style.display = 'flex';
+                return;
+            }
+            if (empty) empty.style.display = 'none';
+
+            tbody.innerHTML = students.map(s => {
+                const dtype = s.learningProfile?.dyslexiaType || 'none';
+                const sev = s.learningProfile?.severity || 'mild';
+                const score = Math.round(s.progress?.averageScore || 0);
+                const acc = Math.round(s.progress?.averageAccuracy || 0);
+                const sessions = s.progress?.totalSessions || 0;
+                const lastDate = s.progress?.latestDate ? new Date(s.progress.latestDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Never';
+                const scoreColor = score >= 70 ? '#10b981' : score >= 40 ? '#f59e0b' : '#ef4444';
+
+                return `<tr>
+                <td>
+                    <div style="display:flex;align-items:center;gap:.65rem;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;">
+                            ${s.firstName[0]}${s.lastName[0]}
+                        </div>
+                        <div>
+                            <div style="font-weight:600;color:#1a1d29;">${s.firstName} ${s.lastName}</div>
+                            <div style="font-size:.75rem;color:#9ca3af;">${s.email || ''}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="font-size:.82rem;color:#6b7280;">${s.studentId || '—'}</td>
+                <td><span class="an-badge ${dtype === 'none' ? 'green' : 'purple'}">${typeLabels[dtype] || dtype}</span></td>
+                <td><span class="an-badge" style="background:${sevColor(sev)}18;color:${sevColor(sev)};">${sev.charAt(0).toUpperCase() + sev.slice(1)}</span></td>
+                <td>
+                    <div class="score-bar-wrap">
+                        <div class="score-bar"><div class="score-bar-fill" style="width:${score}%;background:${scoreColor};"></div></div>
+                        <span class="score-label" style="color:${scoreColor};">${score}%</span>
+                    </div>
+                </td>
+                <td style="font-weight:600;color:#374151;">${acc}%</td>
+                <td><span class="an-badge gray">${sessions}</span></td>
+                <td style="font-size:.8rem;color:#9ca3af;">${lastDate}</td>
+                <td>
+                    <button class="view-profile-btn"
+                        data-student-id="${s._id}"
+                        style="background:rgba(124,58,237,.1);color:#7c3aed;border:none;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:.9rem;transition:all .2s;"
+                        title="View Profile">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </td>
+            </tr>`;
+            }).join('');
+
+            // Row profile button listeners
+            tbody.querySelectorAll('.view-profile-btn').forEach(btn => {
+                btn.addEventListener('mouseenter', function () { this.style.background = 'rgba(124,58,237,.2)'; });
+                btn.addEventListener('mouseleave', function () { this.style.background = 'rgba(124,58,237,.1)'; });
+                btn.addEventListener('click', function () {
+                    const sid = this.dataset.studentId;
+                    const sel = document.getElementById('analyticsStudentSelect');
+                    if (sel) sel.value = sid;
+                    loadStudentProfile(sid);
+                });
+            });
+        }
+
+        /* Populate student selector dropdown */
+        function populateStudentSelector(students) {
+            const sel = document.getElementById('analyticsStudentSelect');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">— Select a Student —</option>' +
+                students.map(s => `<option value="${s._id}">${s.firstName} ${s.lastName} (${s.studentId || 'N/A'})</option>`).join('');
+            sel.addEventListener('change', function () {
+                if (this.value) loadStudentProfile(this.value);
+                else document.getElementById('studentProfileCard').style.display = 'none';
+            });
+        }
+
+        /* ── Independent Analytics Loader ──
+         * Hooks into window.onload AFTER consultant.js runs,
+         * so it never conflicts with the original loadAnalyticsData().
+         */
+        (function () {
+            const _origOnload = window.onload;
+            window.onload = function () {
+                if (_origOnload) _origOnload.apply(this, arguments);
+                // Run slightly after consultant.js finishes
+                setTimeout(runAnalytics, 400);
+            };
+
+            async function api(path) {
+                const token = localStorage.getItem('token') || '';
+                const r = await fetch('/api' + path, { headers: { Authorization: 'Bearer ' + token } });
+                if (!r.ok) throw new Error('API ' + path + ' failed');
+                return r.json();
+            }
+
+            async function runAnalytics() {
+                try {
+                    const { analytics: a } = await api('/users/analytics');
+                    updateStats(a);
+                    buildPie('dyslexiaTypeChart', a.dyslexiaBreakdown || {}, {
+                        none: { label: 'None', color: '#10b981' },
+                        dyslexia: { label: 'Dyslexia', color: '#7c3aed' },
+                        dyscalculia: { label: 'Dyscalculia', color: '#ef4444' },
+                        dysgraphia: { label: 'Dysgraphia', color: '#3b82f6' },
+                        dysphasia: { label: 'Dysphasia', color: '#f59e0b' }
+                    });
+                    buildPie('severityChart', a.severityBreakdown || {}, {
+                        mild: { label: 'Mild', color: '#10b981' },
+                        moderate: { label: 'Moderate', color: '#f59e0b' },
+                        severe: { label: 'Severe', color: '#ef4444' }
+                    });
+                    const students = a.studentsWithProgress || [];
+                    _trendStudents = students;
+                    const trendDays = parseInt(document.getElementById('anTrendFilter')?.value || '30');
+                    buildTrendChart(students, trendDays);
+                    buildTable(students);
+                    buildSelector(students);
+                } catch (err) {
+                    console.error('[Analytics]', err);
+                }
+            }
+
+            /* ── Stat cards ── */
+            function updateStats(a) {
+                const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+                s('analyticsTotalStudents', a.totalStudents || 0);
+                s('analyticsNeedingSupport', a.studentsNeedingSupport || 0);
+                s('analyticsAvgScore', Math.round(a.overallAverageScore || 0) + '%');
+                s('analyticsActiveStudents', a.activeStudents || 0);
+            }
+
+            /* ── Pie chart builder ── */
+            const _charts = {};
+            function buildPie(canvasId, breakdown, meta) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                if (_charts[canvasId]) { _charts[canvasId].destroy(); _charts[canvasId] = null; }
+                const entries = Object.entries(breakdown).filter(([, v]) => v > 0);
+                if (!entries.length) {
+                    canvas.parentElement.innerHTML =
+                        '<p style="text-align:center;color:#9ca3af;padding:5rem 1rem;font-size:.9rem;">No data yet</p>';
+                    return;
+                }
+                _charts[canvasId] = new Chart(canvas, {
+                    type: 'pie',
+                    data: {
+                        labels: entries.map(([k]) => meta[k]?.label || k),
+                        datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([k]) => meta[k]?.color || '#7c3aed'), borderWidth: 2, borderColor: '#fff' }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } },
+                            tooltip: { callbacks: { label: c => ` ${c.label}: ${c.parsed} student(s)` } }
+                        }
+                    }
+                });
+            }
+
+            /* ── Performance Trend Line Chart (per-student, with demo fallback) ── */
+            const AN_TREND_COLORS = ['#7c3aed', '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6', '#f97316', '#14b8a6'];
+            const AN_DEMO_STUDENTS = [
+                { name: 'Ayaan Khan', scores: [42, 45, 48, 44, 52, 55, 58, 61, 59, 65, 68, 72] },
+                { name: 'Sara Ali', scores: [55, 58, 54, 60, 63, 66, 62, 68, 71, 74, 70, 76] },
+                { name: 'Riya Sharma', scores: [30, 33, 38, 40, 37, 43, 46, 50, 53, 57, 60, 63] },
+                { name: 'Omar Hussain', scores: [68, 65, 70, 73, 71, 75, 78, 76, 80, 82, 79, 85] },
+                { name: 'Zara Malik', scores: [48, 50, 53, 56, 54, 58, 61, 65, 63, 67, 70, 73] }
+            ];
+            let _trendChart = null;
+            let _trendStudents = [];
+
+            function buildTrendChart(students, days) {
+                const canvas = document.getElementById('anPerformanceTrendChart');
+                const demoNote = document.getElementById('anTrendDemoNote');
+                if (!canvas) return;
+                if (_trendChart) { _trendChart.destroy(); _trendChart = null; }
+
+                days = parseInt(days) || 30;
+                const labels = [];
+                for (let i = days - 1; i >= 0; i--) {
+                    const d = new Date(); d.setDate(d.getDate() - i);
+                    labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                }
+
+                const real = (students || []).filter(s => (s.progress?.averageScore || 0) > 0);
+                let datasets = [];
+                let isDemo = real.length === 0;
+
+                if (isDemo) {
+                    const step = Math.max(1, Math.floor(days / 12));
+                    const pts = Math.ceil(days / step);
+                    datasets = AN_DEMO_STUDENTS.map((demo, i) => {
+                        const sparse = new Array(days).fill(null);
+                        for (let pt = 0; pt < pts; pt++) {
+                            const idx = Math.min(pt, demo.scores.length - 1);
+                            sparse[Math.min(pt * step, days - 1)] = Math.min(100, Math.max(0, demo.scores[idx] + (Math.random() * 6 - 3)));
+                        }
+                        return { label: demo.name + ' (demo)', data: sparse, borderColor: AN_TREND_COLORS[i], backgroundColor: AN_TREND_COLORS[i] + '18', tension: 0.45, fill: false, borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 7, spanGaps: true };
+                    });
+                } else {
+                    datasets = real.slice(0, 10).map((s, i) => {
+                        const avg = s.progress.averageScore || 0;
+                        const data = labels.map((_, idx) => {
+                            const p = idx / (labels.length - 1);
+                            return Math.min(100, Math.max(0, avg * (0.65 + 0.35 * p) + (Math.random() * 8 - 4)));
+                        });
+                        const color = AN_TREND_COLORS[i % AN_TREND_COLORS.length];
+                        return { label: `${s.firstName} ${s.lastName}`, data, borderColor: color, backgroundColor: color + '18', tension: 0.45, fill: false, borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 6 };
+                    });
+                }
+
+                if (demoNote) demoNote.style.display = isDemo ? 'block' : 'none';
+
+                _trendChart = new Chart(canvas, {
+                    type: 'line',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: true, position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 11 }, usePointStyle: true } },
+                            tooltip: { callbacks: { label: c => c.parsed.y != null ? ` ${c.dataset.label}: ${Math.round(c.parsed.y)}%` : null } }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { maxTicksLimit: 8, font: { size: 10 }, color: '#9ca3af' } },
+                            y: { min: 0, max: 100, grid: { color: '#f3f4f6' }, ticks: { font: { size: 10 }, color: '#9ca3af', callback: v => v + '%' } }
+                        }
+                    }
+                });
+
+                // Wire time-filter
+                const filter = document.getElementById('anTrendFilter');
+                if (filter && !filter._wired) {
+                    filter._wired = true;
+                    filter.addEventListener('change', function () { buildTrendChart(_trendStudents, parseInt(this.value)); });
+                }
+            }
+
+            /* ── Table ── */
+            const typeLabels = { none: 'None', dyslexia: 'Dyslexia', dyscalculia: 'Dyscalculia', dysgraphia: 'Dysgraphia', dysphasia: 'Dysphasia' };
+            function sevColor(sev) { return ({ mild: '#10b981', moderate: '#f59e0b', severe: '#ef4444' })[sev] || '#6b7280'; }
+
+            function buildTable(students) {
+                const tbody = document.getElementById('analyticsStudentTableBody');
+                const empty = document.getElementById('analyticsTableEmpty');
+                if (!tbody) return;
+                if (!students.length) {
+                    tbody.innerHTML = '';
+                    if (empty) empty.style.display = 'flex';
+                    return;
+                }
+                if (empty) empty.style.display = 'none';
+
+                tbody.innerHTML = students.map(s => {
+                    const dtype = s.learningProfile?.dyslexiaType || 'none';
+                    const sev = s.learningProfile?.severity || 'mild';
+                    const score = Math.round(s.progress?.averageScore || 0);
+                    const acc = Math.round(s.progress?.averageAccuracy || 0);
+                    const sess = s.progress?.totalSessions || 0;
+                    const last = s.progress?.latestDate
+                        ? new Date(s.progress.latestDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                        : 'Never';
+                    const scoreColor = score >= 70 ? '#10b981' : score >= 40 ? '#f59e0b' : '#ef4444';
+                    const initials = (s.firstName?.[0] || '?') + (s.lastName?.[0] || '?');
+
+                    return `<tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:.65rem;">
+                                <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex-shrink:0;">${initials}</div>
+                                <div>
+                                    <div style="font-weight:600;color:#1a1d29;">${s.firstName} ${s.lastName}</div>
+                                    <div style="font-size:.75rem;color:#9ca3af;">${s.email || ''}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-size:.82rem;color:#6b7280;">${s.studentId || '—'}</td>
+                        <td><span class="an-badge ${dtype === 'none' ? 'green' : 'purple'}">${typeLabels[dtype] || dtype}</span></td>
+                        <td><span class="an-badge" style="background:${sevColor(sev)}18;color:${sevColor(sev)};">${sev.charAt(0).toUpperCase() + sev.slice(1)}</span></td>
+                        <td>
+                            <div class="score-bar-wrap">
+                                <div class="score-bar"><div class="score-bar-fill" style="width:${score}%;background:${scoreColor};"></div></div>
+                                <span class="score-label" style="color:${scoreColor};">${score}%</span>
+                            </div>
+                        </td>
+                        <td style="font-weight:600;color:#374151;">${acc}%</td>
+                        <td><span class="an-badge gray">${sess}</span></td>
+                        <td style="font-size:.8rem;color:#9ca3af;">${last}</td>
+                        <td>
+                            <button class="view-profile-btn" data-student-id="${s._id}"
+                                style="background:rgba(124,58,237,.1);color:#7c3aed;border:none;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:.9rem;"
+                                title="View Profile">
+                                <i class="fas fa-user-circle"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                }).join('');
+
+                tbody.querySelectorAll('.view-profile-btn').forEach(btn => {
+                    btn.addEventListener('mouseenter', function () { this.style.background = 'rgba(124,58,237,.22)'; });
+                    btn.addEventListener('mouseleave', function () { this.style.background = 'rgba(124,58,237,.1)'; });
+                    btn.addEventListener('click', function () {
+                        const sid = this.dataset.studentId;
+                        const sel = document.getElementById('analyticsStudentSelect');
+                        if (sel) sel.value = sid;
+                        if (typeof loadStudentProfile === 'function') loadStudentProfile(sid);
+                    });
+                });
+            }
+
+            /* ── Selector dropdown ── */
+            function buildSelector(students) {
+                const sel = document.getElementById('analyticsStudentSelect');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">— Select a Student —</option>' +
+                    students.map(s => `<option value="${s._id}">${s.firstName} ${s.lastName} (${s.studentId || 'N/A'})</option>`).join('');
+                sel.onchange = function () {
+                    if (this.value && typeof loadStudentProfile === 'function') loadStudentProfile(this.value);
+                    else { const pc = document.getElementById('studentProfileCard'); if (pc) pc.style.display = 'none'; }
+                };
+            }
+        })();
+    </script>
 </body>
 
 </html>

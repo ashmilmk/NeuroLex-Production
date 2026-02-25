@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Consultant Dashboard - Manage students and dyslexia assessments">
-    <title>Student Management - Dyslexia Detection Platform</title>
+    <meta name="description" content="Student Management - NeuroLex Dyslexia Detection Platform">
+    <title>Students - NeuroLex</title>
 
     <!-- Google Fonts -->
     <link
@@ -15,11 +15,9 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- External Stylesheets -->
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="css/consultant.css">
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/students.css">
 </head>
 
 <body>
@@ -73,10 +71,12 @@
         <!-- Main Content Wrapper -->
         <div class="main-wrapper">
             <main class="main-content">
-                <!-- Header -->
+
+                <!-- Page Header -->
                 <div class="dashboard-header">
                     <div class="welcome-text">
                         <h1>Student Management</h1>
+                        <p class="header-subtitle">Monitor, manage, and support your students</p>
                     </div>
                     <div class="header-actions">
                         <div class="search-box">
@@ -93,118 +93,278 @@
                     </div>
                 </div>
 
-                <!-- Dashboard Main Section (Hidden on Students Page) -->
-                <div id="dashboardMainSection" style="display: none;">
+                <!-- Stats Overview -->
+                <div class="students-stats-row">
+                    <div class="stu-stat-card purple">
+                        <div class="stu-stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stu-stat-info">
+                            <span class="stu-stat-value" id="statTotal">—</span>
+                            <span class="stu-stat-label">Total Students</span>
+                        </div>
+                        <div class="stu-stat-bg-icon"><i class="fas fa-users"></i></div>
+                    </div>
+                    <div class="stu-stat-card blue">
+                        <div class="stu-stat-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <div class="stu-stat-info">
+                            <span class="stu-stat-value" id="statAssessed">—</span>
+                            <span class="stu-stat-label">Assessed</span>
+                        </div>
+                        <div class="stu-stat-bg-icon"><i class="fas fa-clipboard-check"></i></div>
+                    </div>
+                    <div class="stu-stat-card red">
+                        <div class="stu-stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stu-stat-info">
+                            <span class="stu-stat-value" id="statNeedAttention">—</span>
+                            <span class="stu-stat-label">Need Attention</span>
+                        </div>
+                        <div class="stu-stat-bg-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    </div>
+                    <div class="stu-stat-card green">
+                        <div class="stu-stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stu-stat-info">
+                            <span class="stu-stat-value" id="statNone">—</span>
+                            <span class="stu-stat-label">No Issues</span>
+                        </div>
+                        <div class="stu-stat-bg-icon"><i class="fas fa-check-circle"></i></div>
+                    </div>
                 </div>
 
-                <!-- Content Grid -->
-                <div class="content-grid">
-                    <!-- Student Table -->
-                    <div class="table-card" id="studentsSection">
-                        <div class="card-header">
-                            <h2>All Students</h2>
-                            <div class="card-actions">
-                                <button class="btn-add" id="addStudentBtn">
-                                    <i class="fas fa-plus"></i>
-                                    Add Student
-                                </button>
+                <!-- Hidden sections (used by consultant.js) -->
+                <div id="dashboardMainSection" style="display: none;"></div>
+                <div id="supportSection" style="display: none;"></div>
+                <div id="analyticsSection" style="display: none;"></div>
+                <div id="resourcesSection" style="display: none;"></div>
+
+                <!-- Student Section -->
+                <div class="students-section-card" id="studentsSection">
+
+                    <!-- Card Header -->
+                    <div class="stu-card-header">
+                        <div class="stu-card-title-group">
+                            <div class="stu-card-icon-box">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div>
+                                <h2 class="stu-card-title">All Students</h2>
+                                <p class="stu-card-subtitle">Manage and track your student roster</p>
                             </div>
                         </div>
-
-                        <div id="studentTableContainer">
-                            <table class="student-table">
-                                <thead>
-                                    <tr>
-                                        <th>Student</th>
-                                        <th>ID</th>
-                                        <th>Grade</th>
-                                        <th>Parent/Guardian</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="studentTableBody">
-                                    <!-- Students loaded dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="empty-state" id="emptyState" style="display: none;">
-                            <i class="fas fa-user-graduate"></i>
-                            <p>No students yet. Add your first student!</p>
+                        <div class="stu-card-actions">
+                            <button class="stu-btn-add" id="addStudentBtn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Add Student</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Hidden Sections on Students Page -->
-                    <div id="supportSection" style="display: none;"></div>
-                    <div id="analyticsSection" style="display: none;"></div>
-                    <div id="resourcesSection" style="display: none;"></div>
+                    <!-- Filter Pills -->
+                    <div class="stu-filter-row">
+                        <button class="stu-filter-pill active" data-filter="all">All</button>
+                        <button class="stu-filter-pill" data-filter="dyslexia">Dyslexia</button>
+                        <button class="stu-filter-pill" data-filter="dyscalculia">Dyscalculia</button>
+                        <button class="stu-filter-pill" data-filter="dysgraphia">Dysgraphia</button>
+                        <button class="stu-filter-pill" data-filter="none">No Issues</button>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="stu-table-wrapper" id="studentTableContainer">
+                        <table class="stu-table student-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>ID</th>
+                                    <th>Grade</th>
+                                    <th>Parent / Guardian</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="stu-empty-state" id="emptyState" style="display: none;">
+                        <div class="stu-empty-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h3>No Students Yet</h3>
+                        <p>Get started by adding your first student to the roster.</p>
+                        <button class="stu-btn-add" onclick="document.getElementById('addStudentBtn').click()">
+                            <i class="fas fa-user-plus"></i> Add First Student
+                        </button>
+                    </div>
                 </div>
+
             </main>
         </div>
     </div>
 
-    <!-- Add/Edit Student Modal -->
+    <!-- ============================================================
+         Add / Edit Student Modal
+         ============================================================ -->
     <div class="modal-overlay" id="studentModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Add New Student</h3>
-                <button class="modal-close" id="closeModal">&times;</button>
+        <div class="stu-modal">
+
+            <!-- Gradient Banner -->
+            <div class="stu-modal-banner">
+                <div class="stu-modal-banner-art">
+                    <div class="stu-modal-banner-circle c1"></div>
+                    <div class="stu-modal-banner-circle c2"></div>
+                    <div class="stu-modal-banner-circle c3"></div>
+                </div>
+                <div class="stu-modal-banner-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stu-modal-banner-text">
+                    <h3 id="modalTitle">Add New Student</h3>
+                    <p>Fill in the details below to enroll a student</p>
+                </div>
+                <button class="stu-modal-close" id="closeModal">&times;</button>
             </div>
-            <form id="studentForm">
+
+            <!-- Form -->
+            <form id="studentForm" class="stu-modal-body">
                 <input type="hidden" id="studentIdHidden">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="firstName">First Name *</label>
-                        <input type="text" id="firstName" placeholder="Enter first name" required>
+
+                <!-- ── Student Information ── -->
+                <div class="stu-form-section">
+                    <div class="stu-section-label">
+                        <span class="stu-section-dot purple"></span>
+                        Student Information
                     </div>
-                    <div class="form-group">
-                        <label for="lastName">Last Name *</label>
-                        <input type="text" id="lastName" placeholder="Enter last name" required>
+
+                    <div class="stu-form-row">
+                        <div class="stu-form-group">
+                            <label for="firstName">First Name <span class="req">*</span></label>
+                            <div class="stu-input-box">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="firstName" placeholder="Enter first name" required>
+                            </div>
+                        </div>
+                        <div class="stu-form-group">
+                            <label for="lastName">Last Name <span class="req">*</span></label>
+                            <div class="stu-input-box">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="lastName" placeholder="Enter last name" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stu-form-group">
+                        <label for="email">Email Address <span class="req">*</span></label>
+                        <div class="stu-input-box">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" placeholder="student@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="stu-form-row">
+                        <div class="stu-form-group">
+                            <label for="studentIdInput">Student ID <span class="req">*</span></label>
+                            <div class="stu-input-box">
+                                <i class="fas fa-id-badge"></i>
+                                <input type="text" id="studentIdInput" placeholder="e.g. STU001" required>
+                            </div>
+                        </div>
+                        <div class="stu-form-group">
+                            <label for="grade">Grade / Class</label>
+                            <div class="stu-input-box">
+                                <i class="fas fa-school"></i>
+                                <select id="grade">
+                                    <option value="">Select Grade</option>
+                                    <option value="Grade 1">Grade 1</option>
+                                    <option value="Grade 2">Grade 2</option>
+                                    <option value="Grade 3">Grade 3</option>
+                                    <option value="Grade 4">Grade 4</option>
+                                    <option value="Grade 5">Grade 5</option>
+                                    <option value="Grade 6">Grade 6</option>
+                                    <option value="Grade 7">Grade 7</option>
+                                    <option value="Grade 8">Grade 8</option>
+                                    <option value="Grade 9">Grade 9</option>
+                                    <option value="Grade 10">Grade 10</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stu-form-row">
+                        <div class="stu-form-group">
+                            <label for="dyslexiaType">Dyslexia Type</label>
+                            <div class="stu-input-box">
+                                <i class="fas fa-brain"></i>
+                                <select id="dyslexiaType">
+                                    <option value="none">None Detected</option>
+                                    <option value="dyslexia">Dyslexia</option>
+                                    <option value="dyscalculia">Dyscalculia</option>
+                                    <option value="dysgraphia">Dysgraphia</option>
+                                    <option value="dysphasia">Dysphasia</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="stu-form-group">
+                            <label for="severity">Severity</label>
+                            <div class="stu-input-box">
+                                <i class="fas fa-signal"></i>
+                                <select id="severity">
+                                    <option value="mild">Mild</option>
+                                    <option value="moderate">Moderate</option>
+                                    <option value="severe">Severe</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email Address *</label>
-                    <input type="email" id="email" placeholder="student@email.com" required>
+
+                <!-- ── Parent / Guardian ── -->
+                <div class="stu-section-divider">
+                    <span>Parent / Guardian Information</span>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="studentIdInput">Student ID *</label>
-                        <input type="text" id="studentIdInput" placeholder="STU001" required>
+
+                <div class="stu-form-section">
+                    <div class="stu-form-row">
+                        <div class="stu-form-group">
+                            <label for="parentName">Parent Name <span class="req">*</span></label>
+                            <div class="stu-input-box">
+                                <i class="fas fa-user-tie"></i>
+                                <input type="text" id="parentName" placeholder="Full name" required>
+                            </div>
+                        </div>
+                        <div class="stu-form-group">
+                            <label for="parentPhone">Phone Number <span class="req">*</span></label>
+                            <div class="stu-input-box">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="parentPhone" placeholder="+1 (555) 000-0000" required>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="grade">Grade/Class</label>
-                        <input type="text" id="grade" placeholder="e.g., Grade 5">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="dyslexiaType">Dyslexia Type</label>
-                        <select id="dyslexiaType">
-                            <option value="none">None Detected</option>
-                            <option value="dyslexia">Dyslexia</option>
-                            <option value="dyscalculia">Dyscalculia</option>
-                            <option value="dysgraphia">Dysgraphia</option>
-                            <option value="dysphasia">Dysphasia</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="severity">Severity</label>
-                        <select id="severity">
-                            <option value="mild">Mild</option>
-                            <option value="moderate">Moderate</option>
-                            <option value="severe">Severe</option>
-                        </select>
+
+                    <div class="stu-form-group">
+                        <label for="parentAddress">Home Address <span class="req">*</span></label>
+                        <div class="stu-input-box stu-textarea-box">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <textarea id="parentAddress" placeholder="Full postal address" rows="3" required></textarea>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-cancel" id="cancelModal">Cancel</button>
-                    <button type="submit" class="btn-submit" id="submitBtn">Add Student</button>
+
+                <!-- Footer -->
+                <div class="stu-modal-footer">
+                    <button type="button" class="stu-btn-cancel" id="cancelModal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="stu-btn-submit" id="submitBtn">
+                        <i class="fas fa-user-plus"></i> Add Student
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Assign Test Modal -->
+    <!-- ============================================================
+         Assign Test Modal
+         ============================================================ -->
     <div class="modal-overlay" id="testModal">
         <div class="modal">
             <div class="modal-header">
@@ -222,7 +382,7 @@
                         <option value="visual_association">Visual Association (Letter Matching)</option>
                         <option value="auditory_processing">Auditory Processing (Phonemic)</option>
                         <option value="visual_memory">Visual Memory (Pattern Recall)</option>
-                        <option value="rapid_naming">Rapid Naming (Speed & Fluency)</option>
+                        <option value="rapid_naming">Rapid Naming (Speed &amp; Fluency)</option>
                     </select>
                 </div>
                 <div class="modal-footer">
@@ -235,6 +395,34 @@
 
     <script src="js/student-profile.js"></script>
     <script src="js/consultant.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token') || '';
+            fetch('/api/users/analytics', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(r => r.ok ? r.json() : null)
+                .then(json => {
+                    if (!json) return;
+                    const a = json.analytics || {};
+                    const bd = a.dyslexiaBreakdown || {};
+                    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+                    set('statTotal', a.totalStudents || 0);
+                    set('statAssessed', a.activeStudents || 0);
+                    set('statNeedAttention', a.studentsNeedingSupport || 0);
+                    set('statNone', bd.none || 0);
+                }).catch(() => { });
+
+            document.querySelectorAll('.stu-filter-pill').forEach(pill => {
+                pill.addEventListener('click', function () {
+                    document.querySelectorAll('.stu-filter-pill').forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    const filter = this.dataset.filter;
+                    document.querySelectorAll('#studentTableBody tr').forEach(row => {
+                        row.style.display = (filter === 'all' || row.textContent.toLowerCase().includes(filter)) ? '' : 'none';
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
