@@ -561,5 +561,31 @@ router.delete('/game-result/:id', auth, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/progress/assessment-result/:id
+// @desc    Delete a specific assessment result
+// @access  Private
+router.delete('/assessment-result/:id', auth, async (req, res) => {
+  try {
+    const result = await AssessmentResult.findByIdAndDelete(req.params.id);
+    if (!result) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Assessment result not found'
+      });
+    }
+
+    res.json({
+      status: 'success',
+      message: 'Assessment result deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete assessment result error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error'
+    });
+  }
+});
+
 module.exports = router;
 

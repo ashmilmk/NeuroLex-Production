@@ -183,7 +183,7 @@ router.get('/admin/flagged', async (req, res) => {
         const sanitizedChats = flaggedChats.map(chat => {
             const doc = chat.toObject();
             if (!doc.userId) {
-                doc.userId = { firstName: 'Deleted', lastName: 'User', email: 'N/A' };
+                doc.userId = { firstName: 'Anonymous/Removed', lastName: 'Student', email: 'N/A' };
             }
             return doc;
         });

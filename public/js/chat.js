@@ -35,8 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const messagesContainer = document.getElementById('chatMessages');
 
     // State
-    const user = JSON.parse(localStorage.getItem('user'));
-    const userId = user ? user.id : null; // Adjust based on actual user object structure
+    // Try to get studentDbId, if not fallback to parsing a 'user' object just in case
+    let userId = localStorage.getItem('studentDbId');
+    if (!userId) {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            userId = user ? user.id : null;
+        } catch (e) { }
+    }
 
     // Toggle Chat
     chatBtn.addEventListener('click', () => {

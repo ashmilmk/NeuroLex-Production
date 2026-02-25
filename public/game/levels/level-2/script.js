@@ -51,6 +51,7 @@ let color = '#000000';
 let size = 6;
 let drawing = false;
 let lastPoint = null;
+let drawingStartTime = null;
 
 /* Use fixed logical canvas size for consistent comparison */
 const CANVAS_W = 900;
@@ -114,6 +115,7 @@ startBtn.addEventListener('click', () => {
   initDrawingCanvas();
   drawGuideText(text);
   // Ensure the drawing canvas overlays the prompt visually
+  drawingStartTime = Date.now();
   showStep(step2);
 });
 
@@ -353,7 +355,142 @@ function showResult(childDataURL, refDataURL, score) {
   accuracyValue.textContent = `${score}%`;
   accuracyFeedback.textContent = getFeedback(score);
 
+  // Save the result to localStorage and database
+  saveDrawingResult(score);
+
   showStep(step3);
+}
+
+/* Merge drawing result into the Level 1 assessment entry */
+function saveDrawingResult(score) {
+  const drawingTime = Date.now() - (drawingStartTime || Date.now());
+
+  // Assess dysgraphia based on drawing accuracy
+  const drawingDisorder = score < 60 ? {
+    name: 'Dysgraphia (Drawing)',
+    description: 'Drawing/writing accuracy needs improvement',
+    percentage: score,
+    severity: score < 40 ? 'High' : 'Moderate',
+    icon: '✏️'
+  } : null;
+
+  // --- Merge into Level 1 localStorage entry ---
+  const pendingId = localStorage.getItem('pendingLevel1ResultId');
+  const gameResults = JSON.parse(localStorage.getItem('gameResults') || '[]');
+
+  let mergedResult = null;
+
+  if (pendingId) {
+    // Find the Level 1 entry by its ID
+    const idx = gameResults.findIndex(r => String(r.id) === pendingId);
+    if (idx !== -1) {
+      mergedResult = gameResults[idx];
+      // Add drawing accuracy to talent scores
+      mergedResult.talentScores.drawingAccuracy = score;
+      // Add drawing time to total time
+      mergedResult.totalTime = (mergedResult.totalTime || 0) + drawingTime;
+      // Increment challenges completed
+      mergedResult.challengesCompleted = (mergedResult.challengesCompleted || 0) + 1;
+      // Add dysgraphia drawing disorder if applicable
+      if (drawingDisorder) {
+        if (!mergedResult.disorders) mergedResult.disorders = [];
+        mergedResult.disorders.push(drawingDisorder);
+      }
+      // Update the localStorage entry in-place
+      gameResults[idx] = mergedResult;
+      localStorage.setItem('gameResults', JSON.stringify(gameResults));
+      console.log('Drawing result merged into Level 1 entry:', mergedResult);
+    }
+  }
+
+  // If no Level 1 entry found, save as a standalone entry (fallback)
+  if (!mergedResult) {
+    const playerName = localStorage.getItem('userName') || 'Student';
+    mergedResult = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      playerName: playerName,
+      ageGroup: 'drawing',
+      score: score,
+      totalPossible: 100,
+      percentage: score,
+      talentScores: { drawingAccuracy: score },
+      disorders: drawingDisorder ? [drawingDisorder] : [],
+      challengesCompleted: 1,
+      totalTime: drawingTime
+    };
+    gameResults.push(mergedResult);
+    if (gameResults.length > 50) {
+      gameResults.splice(0, gameResults.length - 50);
+    }
+    localStorage.setItem('gameResults', JSON.stringify(gameResults));
+    console.log('Drawing result saved as standalone (no Level 1 found):', mergedResult);
+  }
+
+  // Clean up pending references
+  localStorage.removeItem('pendingLevel1ResultId');
+
+  // --- Update database: delete old Level 1 entry and save merged version ---
+  const token = localStorage.getItem('token') || localStorage.getItem('studentToken');
+  const pendingDbId = localStorage.getItem('pendingLevel1DbId');
+  const isConsultantSession = localStorage.getItem('pendingConsultantSession') === 'true';
+  const consultantStudentId = localStorage.getItem('pendingConsultantStudentId') || '';
+
+  // Clean up all pending flags
+  localStorage.removeItem('pendingLevel1DbId');
+  localStorage.removeItem('pendingConsultantSession');
+  localStorage.removeItem('pendingConsultantStudentId');
+
+  // Choose endpoints based on session type
+  const deleteEndpoint = isConsultantSession
+    ? `/api/progress/assessment-result/${pendingDbId}`
+    : `/api/progress/game-result/${pendingDbId}`;
+  const saveEndpoint = isConsultantSession
+    ? '/api/progress/assessment-result'
+    : '/api/progress/game-result';
+
+  if (token) {
+    // If we have a DB ID from Level 1, delete it first then save the merged version
+    const deletePromise = pendingDbId
+      ? fetch(deleteEndpoint, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).catch(err => console.warn('Could not delete old DB entry:', err))
+      : Promise.resolve();
+
+    deletePromise.then(() => {
+      fetch(saveEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          playerName: mergedResult.playerName,
+          ageGroup: mergedResult.ageGroup,
+          score: mergedResult.score,
+          totalPossible: mergedResult.totalPossible,
+          percentage: mergedResult.percentage,
+          challengesCompleted: mergedResult.challengesCompleted,
+          totalTime: mergedResult.totalTime,
+          talentScores: mergedResult.talentScores,
+          disorders: mergedResult.disorders,
+          studentId: isConsultantSession
+            ? consultantStudentId
+            : (localStorage.getItem('studentId') || '')
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            console.log('Merged result saved to database:', data.gameResult || data.assessmentResult);
+          } else {
+            console.warn('Failed to save merged result:', data.message);
+          }
+        })
+        .catch(err => console.warn('Could not save to database:', err));
+    });
+  }
 }
 
 /* Map score to feedback */

@@ -22,6 +22,7 @@ async function apiRequest(path, method = 'GET', body) {
 function persistStudentSession(payload) {
   localStorage.setItem('studentToken', payload.token);
   localStorage.setItem('studentId', payload.student.studentId);
+  localStorage.setItem('studentDbId', payload.student.id);
   localStorage.setItem('studentName', payload.student.name || 'Student');
   localStorage.setItem('studentGrade', payload.student.grade || '');
 }
@@ -56,15 +57,24 @@ async function handleStudentLogin(e) {
   const studentId = document.getElementById('studentId').value;
   const consultantId = document.getElementById('guardianId').value;
   const submitBtn = e.target.querySelector('.btn-submit');
+  const span = submitBtn.querySelector('span');
+  const originalText = span.textContent;
 
   submitBtn.classList.add('loading');
+
+  const connectingTimeout = setTimeout(() => {
+    span.textContent = 'Connecting...';
+  }, 1500);
 
   try {
     // Call student login endpoint
     const data = await apiRequest('/auth/student-login', 'POST', { studentId, consultantId });
+    clearTimeout(connectingTimeout);
+
     persistStudentSession(data);
     showSuccessMessage('Login successful!');
-    submitBtn.classList.remove('loading');
+    span.textContent = 'Redirecting...';
+    // Keep loading spinner active during redirect
 
     // Redirect to game/assessment with student info
     setTimeout(() => {
@@ -80,6 +90,8 @@ async function handleStudentLogin(e) {
       window.location.href = `game/index.html?name=${studentName}&grade=${gradeGroup}`;
     }, 1000);
   } catch (err) {
+    clearTimeout(connectingTimeout);
+    span.textContent = originalText;
     console.warn("API Error:", err);
     alert(err.message || 'Login failed. Please check your Student ID and Consultant ID.');
     submitBtn.classList.remove('loading');

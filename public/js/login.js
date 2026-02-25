@@ -104,20 +104,32 @@ async function handleLogin(e) {
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
   const submitBtn = e.target.querySelector('.btn-submit');
+  const span = submitBtn.querySelector('span');
+  const originalText = span.textContent;
 
   submitBtn.classList.add('loading');
 
+  // UX UX: show "Connecting..." if it takes a while
+  const connectingTimeout = setTimeout(() => {
+    span.textContent = 'Connecting...';
+  }, 1500);
+
   try {
     const data = await apiRequest('/auth/login', 'POST', { email, password });
+    clearTimeout(connectingTimeout);
+
     persistUserSession(data);
     showSuccessMessage('Login successful!');
-    submitBtn.classList.remove('loading');
+    span.textContent = 'Redirecting...';
+    // Keep loading spinner active during redirect
 
     // Redirect to consultant dashboard immediately
     setTimeout(() => {
       window.location.href = './consultant-dashboard.html';
     }, 1000);
   } catch (err) {
+    clearTimeout(connectingTimeout);
+    span.textContent = originalText;
     alert(err.message || 'Login failed');
     submitBtn.classList.remove('loading');
   }
@@ -153,6 +165,12 @@ async function handleRegister(e) {
   }
 
   submitBtn.classList.add('loading');
+  const span = submitBtn.querySelector('span');
+  const originalText = span.textContent;
+
+  const connectingTimeout = setTimeout(() => {
+    span.textContent = 'Creating Account...';
+  }, 1500);
 
   try {
     const data = await apiRequest('/auth/register', 'POST', {
@@ -165,13 +183,17 @@ async function handleRegister(e) {
       role: 'teacher' // Backend uses 'teacher' role for consultants
     });
 
+    clearTimeout(connectingTimeout);
     showSuccessMessage('Account created successfully!');
+    span.textContent = 'Redirecting...';
     persistUserSession(data);
 
     setTimeout(() => {
       window.location.href = './consultant-dashboard.html';
     }, 1000);
   } catch (err) {
+    clearTimeout(connectingTimeout);
+    span.textContent = originalText;
     alert(err.message || 'Registration failed');
     submitBtn.classList.remove('loading');
   }

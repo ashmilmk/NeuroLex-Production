@@ -7,6 +7,10 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, 'config.env') });
 
+// Fix: Node v25 SRV DNS resolution issue with MongoDB Atlas
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const progressRoutes = require('./routes/progress');
@@ -14,8 +18,19 @@ const chatRoutes = require('./routes/chat');
 
 const app = express();
 
-// Basic hardening
-app.use(helmet());
+// Basic hardening — allow CDN resources used by the frontend
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+    }
+  }
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,

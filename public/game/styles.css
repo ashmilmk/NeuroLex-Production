@@ -20,7 +20,7 @@
     --border-light: #e5e7eb;
     --shadow-light: rgba(0, 0, 0, 0.1);
     --shadow-medium: rgba(0, 0, 0, 0.15);
-    
+
     /* Typography */
     --font-primary: 'Open Sans', sans-serif;
     --font-dyslexia: 'Comic Neue', sans-serif;
@@ -62,18 +62,64 @@ body {
     animation: floatStudent 8s ease-in-out infinite;
 }
 
-.floating-student-icon:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
-.floating-student-icon:nth-child(2) { top: 20%; right: 15%; animation-delay: 1s; }
-.floating-student-icon:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 2s; }
-.floating-student-icon:nth-child(4) { bottom: 20%; right: 10%; animation-delay: 3s; }
-.floating-student-icon:nth-child(5) { top: 50%; left: 5%; animation-delay: 4s; }
-.floating-student-icon:nth-child(6) { top: 60%; right: 5%; animation-delay: 5s; }
-.floating-student-icon:nth-child(7) { top: 30%; left: 50%; animation-delay: 6s; }
-.floating-student-icon:nth-child(8) { bottom: 10%; left: 50%; animation-delay: 7s; }
+.floating-student-icon:nth-child(1) {
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.floating-student-icon:nth-child(2) {
+    top: 20%;
+    right: 15%;
+    animation-delay: 1s;
+}
+
+.floating-student-icon:nth-child(3) {
+    bottom: 30%;
+    left: 20%;
+    animation-delay: 2s;
+}
+
+.floating-student-icon:nth-child(4) {
+    bottom: 20%;
+    right: 10%;
+    animation-delay: 3s;
+}
+
+.floating-student-icon:nth-child(5) {
+    top: 50%;
+    left: 5%;
+    animation-delay: 4s;
+}
+
+.floating-student-icon:nth-child(6) {
+    top: 60%;
+    right: 5%;
+    animation-delay: 5s;
+}
+
+.floating-student-icon:nth-child(7) {
+    top: 30%;
+    left: 50%;
+    animation-delay: 6s;
+}
+
+.floating-student-icon:nth-child(8) {
+    bottom: 10%;
+    left: 50%;
+    animation-delay: 7s;
+}
 
 @keyframes floatStudent {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-30px) rotate(180deg); }
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-30px) rotate(180deg);
+    }
 }
 
 /* Accessibility Panel */
@@ -138,7 +184,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -162,6 +208,21 @@ body {
     overflow: hidden;
 }
 
+/* Game screen: fit entire challenge in one viewport */
+#game-screen {
+    padding: 20px 30px;
+    display: none;
+    flex-direction: column;
+    max-height: calc(100vh - 30px);
+    overflow: visible;
+}
+
+#game-screen.active {
+    display: flex;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .screen::before {
     content: '';
     position: absolute;
@@ -174,8 +235,13 @@ body {
 }
 
 @keyframes rainbow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 100% 50%;
+    }
 }
 
 .screen.active {
@@ -187,6 +253,7 @@ body {
         opacity: 0;
         transform: translateY(50px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -210,9 +277,22 @@ body {
 }
 
 @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-10px); }
-    60% { transform: translateY(-5px); }
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-10px);
+    }
+
+    60% {
+        transform: translateY(-5px);
+    }
 }
 
 .title {
@@ -449,11 +529,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40px;
-    padding: 25px;
+    margin-bottom: 15px;
+    padding: 15px 20px;
     background: var(--bg-light);
-    border-radius: 20px;
+    border-radius: 15px;
     border: 2px solid var(--border-light);
+    flex-shrink: 0;
 }
 
 .player-info {
@@ -463,15 +544,15 @@ body {
 }
 
 .player-avatar {
-    width: 60px;
-    height: 60px;
+    width: 45px;
+    height: 45px;
     background: linear-gradient(45deg, var(--primary-blue), var(--accent-green));
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 .player-details {
@@ -526,8 +607,13 @@ body {
 }
 
 @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .score-display {
@@ -550,12 +636,12 @@ body {
 
 /* Game Content */
 .game-content {
-    margin: 40px 0;
+    margin: 10px 0;
 }
 
 #challenge-container {
     background: var(--bg-light);
-    padding: 40px;
+    padding: 20px 25px;
     border-radius: 20px;
     border: 2px solid var(--border-light);
 }
@@ -564,11 +650,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 #challenge-title {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--text-dark);
     line-height: 1.2;
@@ -588,43 +674,49 @@ body {
 }
 
 .challenge-description {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: var(--text-light);
-    margin-bottom: 30px;
-    line-height: 1.5;
+    margin-bottom: 10px;
+    line-height: 1.4;
     letter-spacing: 0.02em;
 }
 
 .challenge-content {
-    margin: 30px 0;
-    min-height: 200px;
+    margin: 10px 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.5rem;
     background: white;
     border-radius: 15px;
     border: 2px solid var(--border-light);
-    padding: 30px;
+    padding: 15px;
     line-height: 1.4;
     letter-spacing: 0.02em;
+}
+
+.challenge-content img {
+    max-height: 140px;
+    width: auto;
+    object-fit: contain;
 }
 
 .challenge-options {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
     max-width: 600px;
     margin: 0 auto;
 }
 
 .option-btn {
-    padding: 25px 30px;
-    font-size: 1.2rem;
+    padding: 14px 20px;
+    font-size: 1.1rem;
+    width: 100%;
     background: linear-gradient(45deg, var(--accent-green), var(--accent-purple));
     color: white;
     border: none;
-    border-radius: 15px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-family: inherit;
@@ -669,20 +761,34 @@ body {
 }
 
 @keyframes correctAnswer {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 @keyframes incorrectAnswer {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(0.95); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
 }
 
 .game-controls {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     justify-content: center;
-    margin-top: 40px;
+    margin-top: 15px;
 }
 
 /* Results Screen */
@@ -792,56 +898,56 @@ body {
     .container {
         padding: 10px;
     }
-    
+
     .screen {
         padding: 25px;
         margin: 10px;
     }
-    
+
     .title {
         font-size: 2.5rem;
     }
-    
+
     .subtitle {
         font-size: 1.2rem;
     }
-    
+
     .game-header {
         flex-direction: column;
         gap: 20px;
     }
-    
+
     .challenge-header {
         flex-direction: column;
         gap: 15px;
         text-align: center;
     }
-    
+
     #challenge-title {
         font-size: 2rem;
     }
-    
+
     .game-controls {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .results-actions {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .features-preview {
         grid-template-columns: 1fr;
     }
-    
+
     .accessibility-panel {
         top: 10px;
         right: 10px;
         padding: 10px;
         gap: 5px;
     }
-    
+
     .accessibility-btn {
         width: 40px;
         height: 40px;
@@ -1072,19 +1178,19 @@ body {
         margin-top: 1rem;
         margin-bottom: 1rem;
     }
-    
+
     .passages-header h2 {
         font-size: 2rem;
     }
-    
+
     .passage-card {
         padding: 1.5rem;
     }
-    
+
     .passage-card h3 {
         font-size: 1.3rem;
     }
-    
+
     .passage-text {
         font-size: 1rem;
         padding: 0.8rem;
@@ -1098,4 +1204,4 @@ body {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-} 
+}

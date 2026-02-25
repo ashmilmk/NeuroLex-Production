@@ -428,8 +428,7 @@ function viewProgress() {
 
         // Ensure the latest player name is stored for filtering on progress page
         if (gameState.playerName && typeof gameState.playerName === 'string') {
-            console.log('Setting userName to:', gameState.playerName);
-            localStorage.setItem('userName', gameState.playerName);
+            localStorage.setItem('lastPlayerName', gameState.playerName);
             console.log('Retrieved userName from localStorage:', localStorage.getItem('userName'));
         } else {
             console.warn('gameState.playerName is not a valid string:', gameState.playerName);
@@ -957,8 +956,11 @@ function selectAnswer(selectedIndex) {
         }
     }
 
-    // Enable next challenge button
+    // Enable next challenge button and scroll it into view
     elements.nextChallenge.disabled = false;
+    setTimeout(() => {
+        elements.nextChallenge.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 300);
 }
 
 // Submit Creative Answer
@@ -1165,12 +1167,21 @@ function saveGameResults(totalPossible, percentage, disorders, roundedScore) {
 
     console.log('Game results saved to localStorage:', gameResult);
 
+    // Store reference for Level 2 to merge drawing results into this entry
+    localStorage.setItem('pendingLevel1ResultId', String(gameResult.id));
+
     // Also save to database via API
     const isConsultantSession = localStorage.getItem('consultantSession') === 'true';
     const consultantStudentId = localStorage.getItem('consultantStudentId') || ''; // student's MongoDB _id
     // Clear flags immediately after reading
     localStorage.removeItem('consultantSession');
     localStorage.removeItem('consultantStudentId');
+
+    // Preserve consultant info for Level 2 to use when merging
+    if (isConsultantSession) {
+        localStorage.setItem('pendingConsultantSession', 'true');
+        localStorage.setItem('pendingConsultantStudentId', consultantStudentId);
+    }
 
     const token = localStorage.getItem('token') || localStorage.getItem('studentToken');
     if (token) {
@@ -1208,6 +1219,10 @@ function saveGameResults(totalPossible, percentage, disorders, roundedScore) {
             .then(data => {
                 if (data.status === 'success') {
                     console.log('Game results saved to database:', data.gameResult);
+                    // Store DB ID for Level 2 to update this result
+                    if (data.gameResult && data.gameResult._id) {
+                        localStorage.setItem('pendingLevel1DbId', data.gameResult._id);
+                    }
                 } else {
                     console.warn('Failed to save to database:', data.message);
                 }

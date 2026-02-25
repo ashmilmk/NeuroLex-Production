@@ -11,9 +11,7 @@ async function loadResults() {
             console.error('Elements not found:', { resultsContent, studentNameDisplay });
             return;
         }
-
-        const filterName = localStorage.getItem('userName') || '';
-
+        const filterName = localStorage.getItem('studentName') || localStorage.getItem('lastPlayerName') || '';
         if (filterName) {
             studentNameDisplay.textContent = `Results for: ${filterName}`;
         } else {
@@ -103,7 +101,8 @@ async function loadResults() {
             const gradeLabel = {
                 'grade12': 'Grade 1-2',
                 'grade34': 'Grade 3-4',
-                'grade56': 'Grade 5-6'
+                'grade56': 'Grade 5-6',
+                'drawing': 'Drawing (Level 2)'
             }[result.ageGroup] || result.ageGroup;
 
             const disordersHTML = result.disorders && result.disorders.length > 0
@@ -308,7 +307,8 @@ function getTalentIcon(talent) {
         problemSolving: '💡',
         dyscalculia: '🔢',
         dysphasia: '🗣️',
-        dysgraphia: '✏️'
+        dysgraphia: '✏️',
+        drawingAccuracy: '🖊️'
     };
     return icons[talent] || '✨';
 }
@@ -322,7 +322,8 @@ function formatTalentName(talent) {
         problemSolving: 'Problem Solving',
         dyscalculia: 'Dyscalculia',
         dysphasia: 'Dysphasia',
-        dysgraphia: 'Dysgraphia'
+        dysgraphia: 'Dysgraphia',
+        drawingAccuracy: 'Drawing Accuracy'
     };
     return names[talent] || talent;
 }

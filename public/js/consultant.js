@@ -411,7 +411,7 @@ window.onload = function () {
             showToast(`ID ${id} generated!`);
         },
         'quickActionViewAnalytics': () => { if (els.navAnalytics) els.navAnalytics.click(); },
-        'quickActionStartAssessment': () => { window.location.href = 'game/index.html'; },
+        'quickActionStartAssessment': () => { window.location.href = 'students.html'; },
         'quickActionSupportRequests': () => { if (els.navSupport) els.navSupport.click(); }
     };
 
@@ -952,7 +952,7 @@ async function openAssessmentResultsModal(studentId, studentName) {
         const barsEl = document.getElementById('arTalentBars');
         if (barsEl) {
             const ts = latest.talentScores || {};
-            const barColors = { creativity: '#8b5cf6', logic: '#2563eb', memory: '#10b981', observation: '#f59e0b', problemSolving: '#ef4444', dyscalculia: '#06b6d4', dysphasia: '#ec4899', dysgraphia: '#f97316' };
+            const barColors = { creativity: '#8b5cf6', logic: '#2563eb', memory: '#10b981', observation: '#f59e0b', problemSolving: '#ef4444', dyscalculia: '#06b6d4', dysphasia: '#ec4899', dysgraphia: '#f97316', drawingAccuracy: '#16a34a' };
             barsEl.innerHTML = Object.entries(ts).map(([key, val]) => {
                 const maxVal = 100;
                 const pct = Math.min(100, Math.round((val / maxVal) * 100));
