@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  dateOfBirth: {
+    type: Date,
+    default: null
+  },
   parentName: {
     type: String,
     trim: true
@@ -73,7 +77,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     required: false
   },
-  department: {
+  consultantPhone: {
     type: String,
     trim: true
   },
@@ -121,6 +125,15 @@ const userSchema = new mongoose.Schema({
   isEmailVerified: {
     type: Boolean,
     default: false
+  },
+  // Password reset
+  resetPasswordToken: {
+    type: String,
+    default: null
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null
   },
   // Timestamps
   createdAt: {

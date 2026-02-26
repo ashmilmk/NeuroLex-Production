@@ -1,5 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { auth } = require('../middleware/auth');
@@ -17,14 +19,14 @@ const generateToken = (userId) => {
 // @desc    Register a new user
 // @access  Public
 router.post('/register', [
-  body('firstName').trim().isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
-  body('lastName').trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
+  body('firstName').trim().isLength({ min: 1, max: 50 }).withMessage('First name is required'),
+  body('lastName').trim().isLength({ min: 1, max: 50 }).withMessage('Last name is required'),
   body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
   body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
   body('role').optional().isIn(['student', 'teacher']).withMessage('Role must be student or teacher'),
   body('studentId').optional().trim(),
   // body('employeeId').optional().trim(), // Deprecated for new registrations
-  body('department').optional().trim()
+  body('consultantPhone').optional().trim()
 ], async (req, res) => {
   try {
     // Check for validation errors
@@ -32,12 +34,12 @@ router.post('/register', [
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: 'error',
-        message: 'Validation failed',
+        message: errors.array()[0].msg || 'Validation failed',
         errors: errors.array()
       });
     }
 
-    const { firstName, lastName, email, password, role, studentId, department } = req.body;
+    const { firstName, lastName, email, password, role, studentId, consultantPhone } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findByEmail(email);
@@ -56,10 +58,10 @@ router.post('/register', [
       });
     }
 
-    if (role === 'teacher' && !department) {
+    if (role === 'teacher' && !consultantPhone) {
       return res.status(400).json({
         status: 'error',
-        message: 'Department is required for teacher registration'
+        message: 'Phone number is required for consultant registration'
       });
     }
 
@@ -76,17 +78,19 @@ router.post('/register', [
     if (role === 'student') {
       userData.studentId = studentId;
     } else if (role === 'teacher') {
-      // Generate Consultant ID
+      // Generate sequential Consultant ID: CNS0001, CNS0002, ...
       let isUnique = false;
       let consultantId = '';
       while (!isUnique) {
-        const randomId = Math.floor(100000 + Math.random() * 900000); // 6 digit random number
-        consultantId = `CNS${randomId}`;
+        const allIds = await User.find({ role: 'teacher', consultantId: /^CNS\d+$/ }, 'consultantId').lean();
+        const nums = allIds.map(u => parseInt(u.consultantId.replace('CNS', ''))).filter(n => !isNaN(n));
+        const next = (nums.length ? Math.max(...nums) : 0) + 1;
+        consultantId = `CNS${String(next).padStart(4, '0')}`;
         const existing = await User.findOne({ consultantId });
         if (!existing) isUnique = true;
       }
       userData.consultantId = consultantId;
-      userData.department = department;
+      userData.consultantPhone = consultantPhone;
     }
 
     // Create new user
@@ -354,6 +358,188 @@ router.post('/student-login', [
     res.status(500).json({
       status: 'error',
       message: 'Server error during student login'
+    });
+  }
+});
+
+// @route   POST /api/auth/forgot-password
+// @desc    Send password reset email
+// @access  Public
+router.post('/forgot-password', [
+  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Please enter a valid email address'
+      });
+    }
+
+    const { email } = req.body;
+    const user = await User.findOne({ email: email.toLowerCase(), role: 'teacher' });
+
+    if (!user) {
+      // Don't reveal whether the email exists for security
+      return res.json({
+        status: 'success',
+        message: 'If an account with that email exists, a password reset link has been sent.'
+      });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    // Save to user
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save({ validateBeforeSave: false });
+
+    // Build reset URL
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const resetUrl = `${protocol}://${host}/reset-password.html?token=${resetToken}`;
+
+    // Send email
+    try {
+      // Create transporter — uses Ethereal for dev (works without real SMTP credentials)
+      let transporter;
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        // Production: use configured SMTP
+        transporter = nodemailer.createTransport({
+          service: process.env.EMAIL_SERVICE || 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+          }
+        });
+      } else {
+        // Dev fallback: Ethereal test account
+        const testAccount = await nodemailer.createTestAccount();
+        transporter = nodemailer.createTransport({
+          host: 'smtp.ethereal.email',
+          port: 587,
+          secure: false,
+          auth: {
+            user: testAccount.user,
+            pass: testAccount.pass
+          }
+        });
+      }
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER || '"NeuroLex Support" <noreply@neurolex.com>',
+        to: user.email,
+        subject: 'NeuroLex — Password Reset Request',
+        html: `
+          <div style="font-family:'Inter',Arial,sans-serif;max-width:520px;margin:auto;padding:2rem;border:1px solid #e5e7eb;border-radius:16px;">
+            <div style="text-align:center;margin-bottom:1.5rem;">
+              <h1 style="color:#7c3aed;font-size:1.5rem;margin:0;">🧠 NeuroLex</h1>
+              <p style="color:#6b7280;font-size:.9rem;">Password Reset Request</p>
+            </div>
+            <p style="color:#374151;font-size:.95rem;line-height:1.6;">
+              Hi <strong>${user.firstName}</strong>,
+            </p>
+            <p style="color:#374151;font-size:.95rem;line-height:1.6;">
+              We received a request to reset your password. Click the button below to set a new password:
+            </p>
+            <div style="text-align:center;margin:1.5rem 0;">
+              <a href="${resetUrl}" style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#7c3aed,#4c1d95);color:white;text-decoration:none;border-radius:10px;font-weight:600;font-size:.95rem;">
+                Reset Password
+              </a>
+            </div>
+            <p style="color:#9ca3af;font-size:.82rem;line-height:1.5;">
+              This link will expire in <strong>1 hour</strong>. If you didn't request this, you can safely ignore this email.
+            </p>
+            <hr style="border:none;border-top:1px solid #f3f4f6;margin:1.5rem 0;">
+            <p style="color:#9ca3af;font-size:.75rem;text-align:center;">
+              NeuroLex Dyslexia Detection Platform<br>
+              &copy; 2026 NeuroLex. All rights reserved.
+            </p>
+          </div>
+        `
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log('[Forgot Password] Email sent:', info.messageId);
+
+      // If using Ethereal, log the preview URL to the console
+      if (!process.env.EMAIL_USER) {
+        const previewUrl = nodemailer.getTestMessageUrl(info);
+        console.log('[Forgot Password] Preview URL:', previewUrl);
+      }
+
+    } catch (emailErr) {
+      console.error('[Forgot Password] Email send failed:', emailErr);
+      // Still respond success for security
+    }
+
+    res.json({
+      status: 'success',
+      message: 'If an account with that email exists, a password reset link has been sent.'
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error. Please try again later.'
+    });
+  }
+});
+
+// @route   POST /api/auth/reset-password
+// @desc    Reset password using token
+// @access  Public
+router.post('/reset-password', [
+  body('token').notEmpty().withMessage('Reset token is required'),
+  body('newPassword').isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: 'error',
+        message: errors.array()[0].msg
+      });
+    }
+
+    const { token, newPassword } = req.body;
+
+    // Hash the provided token to compare with stored hash
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with valid (non-expired) token
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() }
+    }).select('+password');
+
+    if (!user) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid or expired reset token. Please request a new reset link.'
+      });
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.json({
+      status: 'success',
+      message: 'Password has been reset successfully. You can now sign in with your new password.'
+    });
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error. Please try again later.'
     });
   }
 });

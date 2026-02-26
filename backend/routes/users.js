@@ -289,7 +289,8 @@ router.post('/students', [
   body('severity').optional().isIn(['mild', 'moderate', 'severe']),
   body('parentName').optional().trim(),
   body('parentPhone').optional().trim(),
-  body('parentAddress').optional().trim()
+  body('parentAddress').optional().trim(),
+  body('dateOfBirth').optional().isISO8601().withMessage('Invalid date format')
 ], async (req, res) => {
   try {
     console.log('--- CREATE STUDENT DEBUG ---', req.body);
@@ -304,7 +305,7 @@ router.post('/students', [
 
     const {
       firstName, lastName, email, studentId, password, grade,
-      dyslexiaType, severity, parentName, parentPhone, parentAddress
+      dyslexiaType, severity, parentName, parentPhone, parentAddress, dateOfBirth
     } = req.body;
 
     // Check if email already exists
@@ -316,16 +317,22 @@ router.post('/students', [
       });
     }
 
-    // Auto-generate studentId if not provided, always guarantee uniqueness
+    // Auto-generate studentId using consultant name prefix (first + last letter + 'S')
+    // e.g. consultant "Ashmil" → prefix "ALS", students: ALS001, ALS002, ...
+    const consultant = await User.findById(req.user.userId);
+    const cName = (consultant && consultant.firstName) ? consultant.firstName.toUpperCase() : 'XX';
+    const prefix = cName.charAt(0) + cName.charAt(cName.length - 1) + 'S';
+
     let finalStudentId = studentId;
     if (!finalStudentId) {
-      // Find the highest existing STU number and increment
+      // Find the highest existing number for this consultant's prefix
+      const prefixRegex = new RegExp(`^${prefix}\\d+$`);
       let unique = false;
       while (!unique) {
-        const allIds = await User.find({ role: 'student', studentId: /^STU\d+$/ }, 'studentId').lean();
-        const nums = allIds.map(u => parseInt(u.studentId.replace('STU', ''))).filter(n => !isNaN(n));
+        const allIds = await User.find({ role: 'student', studentId: prefixRegex }, 'studentId').lean();
+        const nums = allIds.map(u => parseInt(u.studentId.replace(prefix, ''))).filter(n => !isNaN(n));
         const next = (nums.length ? Math.max(...nums) : 0) + 1;
-        finalStudentId = `STU${String(next).padStart(3, '0')}`;
+        finalStudentId = `${prefix}${String(next).padStart(3, '0')}`;
         const conflict = await User.findOne({ studentId: finalStudentId });
         if (!conflict) unique = true;
       }
@@ -354,6 +361,8 @@ router.post('/students', [
       parentAddress: parentAddress || '',
       createdBy: req.user.userId
     };
+
+    if (dateOfBirth) studentData.dateOfBirth = new Date(dateOfBirth);
 
     // Set learning profile if provided
     if (dyslexiaType || severity) {
@@ -401,7 +410,8 @@ router.put('/students/:id', [
   body('accommodations').optional().isArray(),
   body('parentName').optional().trim(),
   body('parentPhone').optional().trim(),
-  body('parentAddress').optional().trim()
+  body('parentAddress').optional().trim(),
+  body('dateOfBirth').optional().isISO8601().withMessage('Invalid date format')
 ], async (req, res) => {
   try {
     console.log('--- UPDATE STUDENT DEBUG ---', req.params.id, req.body);
@@ -430,7 +440,7 @@ router.put('/students/:id', [
 
     const {
       firstName, lastName, grade, dyslexiaType, severity,
-      accommodations, parentName, parentPhone, parentAddress
+      accommodations, parentName, parentPhone, parentAddress, dateOfBirth
     } = req.body;
 
     // Update basic info
@@ -440,6 +450,7 @@ router.put('/students/:id', [
     if (parentName !== undefined) student.parentName = parentName;
     if (parentPhone !== undefined) student.parentPhone = parentPhone;
     if (parentAddress !== undefined) student.parentAddress = parentAddress;
+    if (dateOfBirth !== undefined) student.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
 
     // Update learning profile
     if (dyslexiaType !== undefined) student.learningProfile.dyslexiaType = dyslexiaType;
