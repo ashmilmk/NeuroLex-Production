@@ -108,27 +108,14 @@ async function handleLogin(e) {
   const originalText = span.textContent;
 
   submitBtn.classList.add('loading');
-
-  // UX UX: show "Connecting..." if it takes a while
-  const connectingTimeout = setTimeout(() => {
-    span.textContent = 'Connecting...';
-  }, 1500);
+  span.textContent = 'Signing In...';
 
   try {
     const data = await apiRequest('/auth/login', 'POST', { email, password });
-    clearTimeout(connectingTimeout);
-
     persistUserSession(data);
-    showSuccessMessage('Login successful!');
-    span.textContent = 'Redirecting...';
-    // Keep loading spinner active during redirect
-
-    // Redirect to consultant dashboard immediately
-    setTimeout(() => {
-      window.location.href = './consultant-dashboard.html';
-    }, 1000);
+    // Redirect immediately — no artificial delay
+    window.location.href = './consultant-dashboard.html';
   } catch (err) {
-    clearTimeout(connectingTimeout);
     span.textContent = originalText;
     alert(err.message || 'Login failed');
     submitBtn.classList.remove('loading');
@@ -143,10 +130,11 @@ async function handleRegister(e) {
   const lastName = document.getElementById('lastName').value;
   const email = document.getElementById('regEmail').value;
   const consultantPhone = document.getElementById('consultantPhone').value;
-  // const employeeId = document.getElementById('employeeId').value;
   const password = document.getElementById('regPassword').value;
   const confirmPassword = document.getElementById('confirmPassword').value;
   const submitBtn = e.target.querySelector('.btn-submit');
+  const span = submitBtn.querySelector('span');
+  const originalText = span.textContent;
 
   // Validation
   if (!validateEmail(email)) {
@@ -172,12 +160,7 @@ async function handleRegister(e) {
   }
 
   submitBtn.classList.add('loading');
-  const span = submitBtn.querySelector('span');
-  const originalText = span.textContent;
-
-  const connectingTimeout = setTimeout(() => {
-    span.textContent = 'Creating Account...';
-  }, 1500);
+  span.textContent = 'Creating Account...';
 
   try {
     const data = await apiRequest('/auth/register', 'POST', {
@@ -185,21 +168,14 @@ async function handleRegister(e) {
       lastName,
       email,
       consultantPhone,
-      // employeeId,
       password,
       role: 'teacher' // Backend uses 'teacher' role for consultants
     });
 
-    clearTimeout(connectingTimeout);
-    showSuccessMessage('Account created successfully!');
-    span.textContent = 'Redirecting...';
     persistUserSession(data);
-
-    setTimeout(() => {
-      window.location.href = './consultant-dashboard.html';
-    }, 1000);
+    // Redirect immediately — no artificial delay
+    window.location.href = './consultant-dashboard.html';
   } catch (err) {
-    clearTimeout(connectingTimeout);
     span.textContent = originalText;
     alert(err.message || 'Registration failed');
     submitBtn.classList.remove('loading');
@@ -234,13 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Check if already logged in - Redirect to dashboard if logged in
-  const token = localStorage.getItem('token');
-  if (token) {
-    // Only redirect if not already on dashboard or login page
-    const currentPath = window.location.pathname;
-    if (!currentPath.includes('consultant-dashboard.html') && !currentPath.includes('index.html')) {
-      window.location.href = 'consultant-dashboard.html';
-    }
-  }
+  // NOTE: We intentionally do NOT auto-redirect when a token already exists in
+  // localStorage. Doing so prevents a consultant from logging in from a second
+  // tab or window (all tabs share the same localStorage). The consultant is
+  // redirected to the dashboard only after a successful login action below.
 });

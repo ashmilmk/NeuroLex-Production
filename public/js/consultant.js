@@ -97,17 +97,33 @@ function updateDyslexiaDistribution(breakdown) {
 
 // Load students table
 async function loadStudents(search = '') {
+    const tbody = document.getElementById('studentTableBody');
+    const emptyState = document.getElementById('emptyState');
+    const tableContainer = document.getElementById('studentTableContainer');
+
+    // Show skeleton rows immediately so the table is never blank
+    if (tbody && !search) {
+        const skeletonRow = `
+            <tr class="skeleton-row">
+                <td><div class="skeleton-cell wide"></div></td>
+                <td><div class="skeleton-cell short"></div></td>
+                <td><div class="skeleton-cell short"></div></td>
+                <td><div class="skeleton-cell medium"></div></td>
+                <td><div class="skeleton-cell short"></div></td>
+            </tr>`;
+        tbody.innerHTML = skeletonRow.repeat(5);
+        if (tableContainer) tableContainer.style.display = 'block';
+        if (emptyState) emptyState.style.display = 'none';
+    }
+
     try {
         const data = await apiRequest(`/users/students?search=${encodeURIComponent(search)}&limit=50`);
         const students = data.students || [];
 
-        const tbody = document.getElementById('studentTableBody');
-        const emptyState = document.getElementById('emptyState');
-        const tableContainer = document.getElementById('studentTableContainer');
-
         if (students.length === 0) {
             if (emptyState) emptyState.style.display = 'block';
             if (tableContainer) tableContainer.style.display = 'none';
+            if (tbody) tbody.innerHTML = '';
         } else {
             if (emptyState) emptyState.style.display = 'none';
             if (tableContainer) tableContainer.style.display = 'block';
@@ -141,6 +157,7 @@ async function loadStudents(search = '') {
         }
     } catch (error) {
         console.error('Failed to load students:', error);
+        if (tbody) tbody.innerHTML = '';
         showToast('Failed to load students', 'error');
     }
 }
@@ -298,8 +315,8 @@ window.onload = function () {
     if (!token) { window.location.href = 'index.html'; return; }
 
     getUserInfo();
-    loadAnalytics();
-    loadStudents();
+    // Run both requests in parallel — they are independent
+    Promise.all([loadAnalytics(), loadStudents()]);
 
     // Cache elements
     const elements = {

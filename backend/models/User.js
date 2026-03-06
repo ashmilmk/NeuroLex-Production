@@ -184,10 +184,14 @@ userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email: email.toLowerCase() });
 };
 
-// Index for better performance
-// userSchema.index({ email: 1 }); // Email is already indexed by unique: true
+// Indexes for better performance
+// Note: email, studentId, consultantId, employeeId are already indexed via unique:true
 userSchema.index({ role: 1 });
 userSchema.index({ 'learningProfile.dyslexiaType': 1 });
+// Compound indexes for the most common query: { role, isActive, createdBy }
+userSchema.index({ role: 1, isActive: 1, createdBy: 1 });
+// For the active-students count query: { role, isActive, progress.lastActive }
+userSchema.index({ role: 1, isActive: 1, 'progress.lastActive': -1 });
 
 module.exports = mongoose.model('User', userSchema);
 

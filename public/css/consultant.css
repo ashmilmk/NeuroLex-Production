@@ -584,6 +584,28 @@
 }
 
 /* ============================================
+   Skeleton Loading Rows
+   ============================================ */
+@keyframes skeleton-shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+
+.skeleton-cell {
+    height: 14px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-cell.wide   { width: 70%; }
+.skeleton-cell.medium { width: 50%; }
+.skeleton-cell.short  { width: 35%; }
+
+.skeleton-row td { border-bottom: 1px solid #f3f4f6; }
+
+/* ============================================
    Enhanced Dashboard Styles
    ============================================ */
 

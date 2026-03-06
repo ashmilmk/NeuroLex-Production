@@ -575,51 +575,41 @@ router.delete('/students/:id', [auth, authorize('teacher', 'admin')], async (req
 router.get('/analytics', [auth, authorize('teacher', 'admin')], async (req, res) => {
   try {
     const Progress = require('../models/Progress');
+    const mongoose = require('mongoose');
 
-    // Get all students with details — scope to this consultant unless admin
-    const ownerMatch = req.user.role !== 'admin' ? { createdBy: require('mongoose').Types.ObjectId.createFromHexString(req.user.userId) } : {};
-    const allStudents = await User.find({ role: 'student', isActive: true, ...ownerMatch })
-      .select('-password')
-      .sort({ createdAt: -1 });
+    const ownerMatch = req.user.role !== 'admin'
+      ? { createdBy: mongoose.Types.ObjectId.createFromHexString(req.user.userId) }
+      : {};
 
-    // Get student counts
-    const totalStudents = allStudents.length;
-
-    // Get students by dyslexia type
-    const dyslexiaStats = await User.aggregate([
-      { $match: { role: 'student', isActive: true, ...ownerMatch } },
-      { $group: { _id: '$learningProfile.dyslexiaType', count: { $sum: 1 } } }
-    ]);
-
-    // Get students by severity
-    const severityStats = await User.aggregate([
-      { $match: { role: 'student', isActive: true, 'learningProfile.dyslexiaType': { $ne: 'none' }, ...ownerMatch } },
-      { $group: { _id: '$learningProfile.severity', count: { $sum: 1 } } }
-    ]);
-
-    // Get recent activity (students active in last 7 days)
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    const activeStudents = await User.countDocuments({
-      role: 'student',
-      isActive: true,
-      'progress.lastActive': { $gte: weekAgo },
-      ...ownerMatch
-    });
 
-    // Format dyslexia stats
-    const dyslexiaBreakdown = {};
-    dyslexiaStats.forEach(stat => {
-      dyslexiaBreakdown[stat._id || 'none'] = stat.count;
-    });
+    // Run all independent queries in parallel for maximum speed
+    const [allStudents, dyslexiaStats, severityStats, activeStudents] = await Promise.all([
+      User.find({ role: 'student', isActive: true, ...ownerMatch })
+        .select('-password')
+        .sort({ createdAt: -1 })
+        .lean(),
 
-    // Format severity stats
-    const severityBreakdown = {};
-    severityStats.forEach(stat => {
-      severityBreakdown[stat._id || 'unknown'] = stat.count;
-    });
+      User.aggregate([
+        { $match: { role: 'student', isActive: true, ...ownerMatch } },
+        { $group: { _id: '$learningProfile.dyslexiaType', count: { $sum: 1 } } }
+      ]),
 
-    // Get progress data for all students
+      User.aggregate([
+        { $match: { role: 'student', isActive: true, 'learningProfile.dyslexiaType': { $ne: 'none' }, ...ownerMatch } },
+        { $group: { _id: '$learningProfile.severity', count: { $sum: 1 } } }
+      ]),
+
+      User.countDocuments({
+        role: 'student',
+        isActive: true,
+        'progress.lastActive': { $gte: weekAgo },
+        ...ownerMatch
+      })
+    ]);
+
+    // Now fetch progress data (needs student IDs from allStudents)
     const studentIds = allStudents.map(s => s._id);
     const progressData = await Progress.aggregate([
       { $match: { userId: { $in: studentIds } } },
@@ -638,11 +628,19 @@ router.get('/analytics', [auth, authorize('teacher', 'admin')], async (req, res)
       }
     ]);
 
+    const totalStudents = allStudents.length;
+
+    // Format dyslexia stats
+    const dyslexiaBreakdown = {};
+    dyslexiaStats.forEach(stat => { dyslexiaBreakdown[stat._id || 'none'] = stat.count; });
+
+    // Format severity stats
+    const severityBreakdown = {};
+    severityStats.forEach(stat => { severityBreakdown[stat._id || 'unknown'] = stat.count; });
+
     // Create a map of student progress
     const progressMap = {};
-    progressData.forEach(p => {
-      progressMap[p._id.toString()] = p;
-    });
+    progressData.forEach(p => { progressMap[p._id.toString()] = p; });
 
     // Enhance students with progress data
     const studentsWithProgress = allStudents.map(student => {
@@ -656,11 +654,7 @@ router.get('/analytics', [auth, authorize('teacher', 'admin')], async (req, res)
         totalTimeSpent: 0,
         averageAccuracy: 0
       };
-
-      return {
-        ...student.toObject(),
-        progress: studentProgress
-      };
+      return { ...student, progress: studentProgress };
     });
 
     // Calculate dyslexia chances (based on progress patterns)
