@@ -1307,8 +1307,24 @@
           });
           var d = await res.json();
           if (d.sessionUrl) { window.location.href = d.sessionUrl; }
-          else { alert('Could not start checkout: ' + (d.message || 'Unknown error')); }
-        } catch(err) { alert('Error: ' + err.message); }
+          else {
+            _showConfirm({
+              icon:       'fa-exclamation-circle',
+              title:      'Checkout Error',
+              message:    d.message || 'Could not start checkout. Please try again.',
+              ok:         'OK',
+              hideCancel: true
+            });
+          }
+        } catch(err) {
+          _showConfirm({
+            icon:       'fa-exclamation-circle',
+            title:      'Something went wrong',
+            message:    err.message || 'An unexpected error occurred.',
+            ok:         'OK',
+            hideCancel: true
+          });
+        }
       };
 
       // Inline billing toggle
@@ -1363,7 +1379,7 @@
           if (upgBtn && sub.plan === 'free' && (sub.isAtLimit || pct >= 67)) {
             upgBtn.style.display = 'inline-flex';
           }
-          if (sub.plan === 'free' && sub.isAtLimit) {
+            if (sub.plan === 'free' && sub.isAtLimit) {
             banner.style.borderColor = 'rgba(239,68,68,0.4)';
             banner.style.background  = 'linear-gradient(135deg,rgba(239,68,68,0.08),rgba(124,58,237,0.06))';
             ['addStudentBtn','quickActionAddStudent'].forEach(function(bid) {
@@ -1371,7 +1387,15 @@
               if (!btn) return;
               btn.addEventListener('click', function(ev) {
                 ev.preventDefault(); ev.stopPropagation();
-                if (confirm('You\'ve reached your 3-student limit.\nUpgrade to add more?')) showPricingSection();
+                _showConfirm({
+                  icon:    'fa-crown',
+                  title:   'Student Limit Reached',
+                  message: "You've used all 3 free student slots. Upgrade your plan to add more students.",
+                  ok:      'View Plans',
+                  cancel:  'Not Now'
+                }).then(function(yes) {
+                  if (yes) showPricingSection();
+                });
               }, true);
             });
           }
@@ -1395,6 +1419,106 @@
     </script>
 
 
+
+    <!-- ═══════════════════════════════════════════
+         Custom Confirm Modal (replaces browser dialog)
+         ═══════════════════════════════════════════ -->
+    <div id="customConfirmModal" style="
+        display:none; position:fixed; inset:0; z-index:99999;
+        align-items:center; justify-content:center;
+        background:rgba(76,29,149,0.18); backdrop-filter:blur(8px);">
+
+      <div style="
+          background:#fff; border-radius:24px;
+          padding:2.25rem 2rem 1.75rem;
+          max-width:380px; width:calc(100% - 2rem);
+          box-shadow:0 24px 64px rgba(76,29,149,0.22), 0 4px 16px rgba(0,0,0,0.08);
+          border:1.5px solid rgba(124,58,237,0.15);
+          animation:ccmPop .22s ease;
+          text-align:center; position:relative;">
+
+        <!-- Icon -->
+        <div style="
+            width:60px; height:60px; border-radius:18px; margin:0 auto 1.25rem;
+            background:linear-gradient(135deg,#ede9fe,#ddd6fe);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.6rem; color:#7c3aed;">
+          <i id="ccmIcon" class="fas fa-crown"></i>
+        </div>
+
+        <h3 id="ccmTitle" style="font-size:1.15rem;font-weight:700;color:#1a1d29;margin-bottom:.5rem;"></h3>
+        <p  id="ccmMsg"   style="font-size:.875rem;color:#6b7280;line-height:1.65;margin-bottom:1.75rem;"></p>
+
+        <div style="display:flex;gap:.75rem;justify-content:center;">
+          <button id="ccmCancel" style="
+              flex:1; padding:.75rem; border-radius:12px;
+              border:1.5px solid #e5e7eb; background:#f9fafb;
+              color:#6b7280; font-weight:600; font-size:.9rem;
+              cursor:pointer; transition:all .2s;"
+            onmouseover="this.style.borderColor='#d1d5db';this.style.color='#374151';"
+            onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#6b7280';">
+            Cancel
+          </button>
+          <button id="ccmOk" style="
+              flex:1; padding:.75rem; border-radius:12px;
+              border:none;
+              background:linear-gradient(135deg,#7c3aed 0%,#4c1d95 100%);
+              color:#fff; font-weight:700; font-size:.9rem;
+              cursor:pointer; transition:all .2s;
+              box-shadow:0 4px 16px rgba(124,58,237,0.35);"
+            onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 22px rgba(124,58,237,0.5)';"
+            onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(124,58,237,0.35)';">
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      @keyframes ccmPop {
+        from { opacity:0; transform:scale(.92) translateY(12px); }
+        to   { opacity:1; transform:scale(1)   translateY(0); }
+      }
+      #customConfirmModal.show { display:flex !important; }
+    </style>
+
+    <script>
+      // Custom confirm() replacement — returns a Promise<boolean>
+      window._showConfirm = function(opts) {
+        return new Promise(function(resolve) {
+          var modal   = document.getElementById('customConfirmModal');
+          var title   = document.getElementById('ccmTitle');
+          var msg     = document.getElementById('ccmMsg');
+          var icon    = document.getElementById('ccmIcon');
+          var okBtn   = document.getElementById('ccmOk');
+          var cancelBtn = document.getElementById('ccmCancel');
+          if (!modal) { resolve(window.confirm(opts.message)); return; }
+
+          title.textContent    = opts.title   || 'Confirm';
+          msg.textContent      = opts.message || '';
+          icon.className       = 'fas ' + (opts.icon || 'fa-crown');
+          okBtn.textContent    = opts.ok     || 'OK';
+          cancelBtn.textContent = opts.cancel || 'Cancel';
+
+          // Show / hide cancel
+          cancelBtn.style.display = opts.hideCancel ? 'none' : '';
+
+          modal.classList.add('show');
+
+          function cleanup(result) {
+            modal.classList.remove('show');
+            okBtn.onclick     = null;
+            cancelBtn.onclick = null;
+            modal.onclick     = null;
+            resolve(result);
+          }
+          okBtn.onclick       = function() { cleanup(true);  };
+          cancelBtn.onclick   = function() { cleanup(false); };
+          // Click outside to cancel
+          modal.onclick = function(e) { if (e.target === modal) cleanup(false); };
+        });
+      };
+    </script>
 
     <!-- Mobile Sidebar Toggle -->
     <script>
