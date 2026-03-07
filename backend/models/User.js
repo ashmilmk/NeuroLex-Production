@@ -135,6 +135,28 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  // Subscription (consultants only)
+  subscription: {
+    plan: {
+      type: String,
+      enum: ['free', 'starter', 'pro', 'enterprise'],
+      default: 'free'
+    },
+    status: {
+      type: String,
+      enum: ['active', 'inactive', 'trial'],
+      default: 'trial'
+    },
+    // Slot limits per plan: free=3, starter=15, pro=50, enterprise=Infinity
+    studentLimit: {
+      type: Number,
+      default: 3
+    },
+    stripeCustomerId:     { type: String, default: null },
+    stripeSubscriptionId: { type: String, default: null },
+    currentPeriodStart: { type: Date, default: null },
+    currentPeriodEnd:   { type: Date, default: null }
+  },
   // Timestamps
   createdAt: {
     type: Date,

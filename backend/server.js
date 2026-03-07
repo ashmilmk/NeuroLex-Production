@@ -25,6 +25,7 @@ const userRoutes = require('./routes/users');
 const progressRoutes = require('./routes/progress');
 const chatRoutes = require('./routes/chat');
 const settingsRoutes = require('./routes/settings');
+const paymentRoutes = require('./routes/payments');
 
 const app = express();
 
@@ -33,11 +34,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://js.stripe.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'", "https://neurolex.tech", "https://www.neurolex.tech"],
+      imgSrc: ["'self'", "data:", "blob:", "https://*.stripe.com"],
+      connectSrc: ["'self'", "https://neurolex.tech", "https://www.neurolex.tech", "https://api.stripe.com"],
+      frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
     }
   }
 }));
@@ -98,6 +100,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/settings', settingsRoutes);
+// Webhook must use raw body — register BEFORE the JSON body-parser middleware takes effect
+app.use('/api/payments', paymentRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {

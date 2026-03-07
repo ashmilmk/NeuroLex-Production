@@ -303,6 +303,32 @@ router.post('/students', [
       });
     }
 
+    // ── Freemium limit check ─────────────────────────────────────────────────
+    if (req.user.role !== 'admin') {
+      const consultant = await User.findById(req.user.userId).select('subscription');
+      const plan = consultant?.subscription?.plan || 'free';
+      const limit = consultant?.subscription?.studentLimit ?? 3;
+
+      if (plan === 'free') {
+        const currentCount = await User.countDocuments({
+          role: 'student',
+          isActive: true,
+          createdBy: req.user.userId
+        });
+        if (currentCount >= limit) {
+          return res.status(403).json({
+            status: 'error',
+            code: 'STUDENT_LIMIT_REACHED',
+            message: `Free plan allows up to ${limit} students. Upgrade to add more.`,
+            upgradeUrl: '/pricing.html',
+            currentCount,
+            limit
+          });
+        }
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     const {
       firstName, lastName, email, studentId, password, grade,
       dyslexiaType, severity, parentName, parentPhone, parentAddress, dateOfBirth
@@ -694,6 +720,43 @@ router.get('/analytics', [auth, authorize('teacher', 'admin')], async (req, res)
       status: 'error',
       message: 'Server error'
     });
+  }
+});
+
+// @route   GET /api/users/subscription-status
+// @desc    Get consultant's subscription plan and student usage
+// @access  Private (Teachers only)
+router.get('/subscription-status', [auth, authorize('teacher', 'admin')], async (req, res) => {
+  try {
+    const consultant = await User.findById(req.user.userId).select('subscription');
+    if (!consultant) {
+      return res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+
+    const plan  = consultant.subscription?.plan  || 'free';
+    const limit = consultant.subscription?.studentLimit ?? 3;
+
+    const currentCount = await User.countDocuments({
+      role: 'student',
+      isActive: true,
+      createdBy: req.user.userId
+    });
+
+    res.json({
+      status: 'success',
+      subscription: {
+        plan,
+        status:             consultant.subscription?.status || 'trial',
+        studentLimit:       limit,
+        currentStudentCount: currentCount,
+        slotsRemaining:     Math.max(0, limit - currentCount),
+        isAtLimit:          currentCount >= limit,
+        currentPeriodEnd:   consultant.subscription?.currentPeriodEnd || null
+      }
+    });
+  } catch (error) {
+    console.error('Subscription status error:', error);
+    res.status(500).json({ status: 'error', message: 'Server error' });
   }
 });
 
