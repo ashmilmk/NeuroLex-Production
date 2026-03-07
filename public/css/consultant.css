@@ -1020,7 +1020,50 @@
     font-size: 1.5rem;
 }
 
-/* Responsive Design */
+/* ============================================
+   Hamburger Menu Button (mobile only)
+   ============================================ */
+.hamburger-btn {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 300;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    transition: all 0.2s ease;
+}
+
+.hamburger-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
+    backdrop-filter: blur(3px);
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
 
 /* Large Tablets and Small Desktops */
 @media (max-width: 1400px) {
@@ -1074,205 +1117,93 @@
     }
 }
 
-/* Mobile and Small Tablets */
+/* ============================================
+   Mobile ≤ 768px — FULL responsive overrides
+   ============================================ */
 @media (max-width: 768px) {
 
-    /* Sidebar adjustments */
+    /* --- Hamburger Button --- */
+    .hamburger-btn {
+        display: flex;
+    }
+
+    /* --- Sidebar: off-canvas, slides in --- */
     .sidebar {
-        width: 70px;
-        padding: 1rem 0.5rem;
-        transition: all 0.3s ease;
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 200;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    /* Show all sidebar text again (hidden in old code) */
+    .sidebar-logo span,
+    .nav-item span {
+        display: block;
     }
 
     .sidebar-logo {
-        justify-content: center;
-        padding-left: 0;
-        margin-bottom: 1.5rem;
-    }
-
-    .sidebar-logo span {
-        display: none;
+        justify-content: flex-start;
+        padding-left: 0.5rem;
+        margin-bottom: 2rem;
     }
 
     .nav-item {
-        padding: 1rem 0.5rem;
-        justify-content: center;
-    }
-
-    .nav-item span {
-        display: none;
+        padding: 1rem 1.25rem;
+        justify-content: flex-start;
     }
 
     .nav-item i {
-        margin: 0;
         font-size: 1.2rem;
     }
 
+    /* --- Main shifts to full-width --- */
     .main-wrapper {
-        margin-left: 70px;
+        margin-left: 0;
     }
 
     .main-content {
-        padding: 1.5rem;
-        border-radius: 20px 0 0 20px;
+        padding: 1.25rem 1rem;
+        padding-top: 4.5rem; /* room for hamburger */
+        border-radius: 0;
     }
 
-    /* Header responsive */
+    /* --- Header --- */
     .dashboard-header {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.75rem;
+        padding: 1rem;
     }
 
     .welcome-text h1 {
-        font-size: 1.5rem;
+        font-size: 1.35rem;
     }
 
     .header-actions {
         width: 100%;
         flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .search-box {
         flex: 1;
-        min-width: 200px;
+        min-width: 0;
+        width: 100%;
     }
 
-    /* Stats cards */
+    .search-box input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* --- Stats cards --- */
     .stats-row-enhanced {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .stat-card-enhanced {
-        padding: 1.25rem;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-    }
-
-    /* Dashboard widgets */
-    .dashboard-content-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .dashboard-widget {
-        padding: 1.25rem;
-    }
-
-    .widget-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-
-    .widget-header h3 {
-        font-size: 1.1rem;
-    }
-
-    /* Quick actions */
-    .quick-actions-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
-    }
-
-    .quick-action-btn {
-        padding: 1.25rem;
-    }
-
-    /* Content grid */
-    .content-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    /* Tables */
-    .student-table {
-        font-size: 0.85rem;
-    }
-
-    .student-table th,
-    .student-table td {
-        padding: 0.75rem 0.5rem;
-    }
-
-    /* Table scroll on mobile */
-    #studentTableContainer,
-    #supportTableContainer {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .table-card {
-        padding: 1rem;
-    }
-
-    .card-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-
-    /* Right sidebar */
-    .right-sidebar {
-        grid-template-columns: 1fr;
-    }
-
-    /* Activity timeline */
-    .activity-timeline {
-        padding-left: 1.5rem;
-    }
-
-    /* Form elements */
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    /* Modals */
-    .modal {
-        width: 95%;
-        max-width: 95%;
-        margin: 1rem;
-        padding: 1.5rem;
-    }
-}
-
-/* Small Mobile Devices */
-@media (max-width: 480px) {
-    .sidebar {
-        width: 60px;
-        padding: 0.75rem 0.25rem;
-    }
-
-    .main-wrapper {
-        margin-left: 60px;
-    }
-
-    .main-content {
-        padding: 1rem;
-        border-radius: 15px 0 0 15px;
-    }
-
-    .dashboard-header {
-        gap: 0.75rem;
-    }
-
-    .welcome-text h1 {
-        font-size: 1.25rem;
-    }
-
-    .header-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .search-box {
-        width: 100%;
+        margin-bottom: 1rem;
     }
 
     .stat-card-enhanced {
@@ -1283,12 +1214,33 @@
         font-size: 1.75rem;
     }
 
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
     .stat-icon-wrapper {
         font-size: 2rem;
     }
 
+    /* --- Dashboard widgets --- */
+    .dashboard-content-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem;
+    }
+
+    /* Large widget should never span 2 cols on mobile */
+    .dashboard-widget.large {
+        grid-column: span 1 !important;
+    }
+
     .dashboard-widget {
         padding: 1rem;
+    }
+
+    .widget-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
     }
 
     .widget-header h3 {
@@ -1299,36 +1251,219 @@
         font-size: 0.8rem;
     }
 
+    /* --- Performance Trend widget inner layout (inline-styled) --- */
+    .widget-content[style*="display:flex"],
+    .widget-content[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 1rem !important;
+        min-height: unset !important;
+    }
+
+    /* Donut chart container (inline: flex: 0 0 260px) */
+    .widget-content > div[style*="flex:0"],
+    .widget-content > div[style*="flex: 0"] {
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        min-width: unset !important;
+    }
+
+    /* CSS donut sizing on mobile */
+    #cssDonut {
+        width: 140px !important;
+        height: 140px !important;
+    }
+
+    /* --- Game results 2-column grid (inline style) --- */
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* --- Analytics charts row (inline style) --- */
+    div[style*="display: grid"][style*="1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* --- Student profile header flex (inline) --- */
+    div[style*="display: flex"][style*="align-items: center"][style*="gap: 1.5rem"] {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+
+    /* Profile avatar */
+    #profileAvatar {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.4rem !important;
+    }
+
+    #profileName {
+        font-size: 1.35rem !important;
+    }
+
+    /* Profile info flex (ID, Grade, Email) */
+    div[style*="display: flex"][style*="gap: 2rem"] {
+        flex-wrap: wrap !important;
+        gap: 0.75rem !important;
+    }
+
+    /* --- Quick Actions --- */
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .quick-action-btn {
+        padding: 1rem 0.75rem;
+    }
+
     .quick-action-icon {
         width: 50px;
         height: 50px;
         font-size: 1.25rem;
     }
 
-    .table-card {
-        padding: 0.75rem;
+    .quick-action-btn span {
+        font-size: 0.8rem;
     }
 
+    /* --- Content grid (student table area) --- */
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+    }
+
+    /* --- Tables --- */
     .student-table {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
+        table-layout: auto;
     }
 
     .student-table th,
     .student-table td {
-        padding: 0.5rem 0.25rem;
+        padding: 0.6rem 0.4rem;
+        white-space: nowrap;
     }
 
-    .btn-add {
-        padding: 0.75rem 1rem;
-        font-size: 0.85rem;
+    #studentTableContainer,
+    #supportTableContainer,
+    #analyticsStudentTable {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-card {
+        padding: 0.75rem;
+    }
+
+    .card-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    /* --- Misc --- */
+    .right-sidebar {
+        grid-template-columns: 1fr;
+    }
+
+    .activity-timeline {
+        padding-left: 1.5rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
     }
 
     .modal {
-        padding: 1rem;
+        width: 95%;
+        max-width: 95%;
+        margin: 1rem;
+        padding: 1.25rem;
     }
 
-    .modal-title {
-        font-size: 1.1rem;
+    /* Consultant ID display */
+    #consultantIdDisplay {
+        font-size: 0.85rem !important;
+        padding: 0.35rem 0.85rem !important;
+    }
+}
+
+/* Small Mobile Devices ≤ 480px */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 4rem 0.75rem 1rem;
+    }
+
+    .dashboard-header {
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .welcome-text h1 {
+        font-size: 1.15rem;
+    }
+
+    .header-actions {
+        flex-direction: column;
+    }
+
+    /* Stats: single column on very small screens */
+    .stats-row-enhanced {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .stat-card-enhanced {
+        padding: 0.85rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .dashboard-widget {
+        padding: 0.85rem;
+    }
+
+    .widget-header h3 {
+        font-size: 0.95rem;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .quick-action-btn {
+        flex-direction: row;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+        text-align: left;
+        justify-content: flex-start;
+    }
+
+    .table-card {
+        padding: 0.6rem;
+    }
+
+    .student-table {
+        font-size: 0.72rem;
+    }
+
+    .student-table th,
+    .student-table td {
+        padding: 0.4rem 0.25rem;
+    }
+
+    .btn-add {
+        padding: 0.6rem 0.85rem;
+        font-size: 0.8rem;
+    }
+
+    .modal {
+        padding: 0.85rem;
     }
 
     .attention-item,

@@ -24,9 +24,17 @@
 </head>
 
 <body>
+    <!-- Hamburger button (mobile only) -->
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar overlay (closes sidebar when tapped) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="dashboard-layout">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <i class="fas fa-brain"></i>
                 <span>NeuroLex</span>
@@ -1102,6 +1110,41 @@
 
     <script src="js/student-profile.js"></script>
     <script src="js/consultant.js"></script>
+
+    <!-- Mobile Sidebar Toggle -->
+    <script>
+        (function () {
+            var hamburger = document.getElementById('hamburgerBtn');
+            var sidebar   = document.getElementById('sidebar');
+            var overlay   = document.getElementById('sidebarOverlay');
+            if (!hamburger || !sidebar || !overlay) return;
+
+            function openSidebar() {
+                sidebar.classList.add('mobile-open');
+                overlay.classList.add('active');
+                hamburger.innerHTML = '<i class="fas fa-times"></i>';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+
+            hamburger.addEventListener('click', function () {
+                sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+            });
+
+            overlay.addEventListener('click', closeSidebar);
+
+            // Close sidebar when a nav link is tapped on mobile
+            sidebar.querySelectorAll('.nav-item').forEach(function (item) {
+                item.addEventListener('click', function () {
+                    if (window.innerWidth <= 768) closeSidebar();
+                });
+            });
+        })();
+    </script>
 </body>
 
 </html>

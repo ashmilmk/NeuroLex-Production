@@ -22,9 +22,17 @@
 </head>
 
 <body>
+    <!-- Hamburger button (mobile only) -->
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="dashboard-layout">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <i class="fas fa-brain"></i>
                 <span>NeuroLex</span>
@@ -376,6 +384,20 @@
     </div>
 
     <script src="js/resources.js"></script>
+    <!-- Mobile Sidebar Toggle -->
+    <script>
+        (function () {
+            var h = document.getElementById('hamburgerBtn'),
+                s = document.getElementById('sidebar'),
+                o = document.getElementById('sidebarOverlay');
+            if (!h || !s || !o) return;
+            function open() { s.classList.add('mobile-open'); o.classList.add('active'); h.innerHTML = '<i class="fas fa-times"></i>'; }
+            function close() { s.classList.remove('mobile-open'); o.classList.remove('active'); h.innerHTML = '<i class="fas fa-bars"></i>'; }
+            h.addEventListener('click', function () { s.classList.contains('mobile-open') ? close() : open(); });
+            o.addEventListener('click', close);
+            s.querySelectorAll('.nav-item').forEach(function (i) { i.addEventListener('click', function () { if (window.innerWidth <= 768) close(); }); });
+        })();
+    </script>
 </body>
 
 </html>
