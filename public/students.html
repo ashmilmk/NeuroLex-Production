@@ -62,6 +62,10 @@
                     <i class="fas fa-headset"></i>
                     <span>Support</span>
                 </a>
+                <a class="nav-item" href="#" id="navPricing" onclick="showPricingSection(event)">
+                    <i class="fas fa-crown"></i>
+                    <span>Upgrade Plan</span>
+                </a>
             </nav>
 
             <div class="sidebar-footer">
@@ -200,6 +204,107 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- ══ Pricing Section (hidden by default) ══ -->
+                <div id="pricingSection" style="display:none;">
+                    <div class="content-header" style="margin-bottom:1.5rem;">
+                        <h2 style="font-size:1.4rem;font-weight:700;color:#1a1d29;margin:0 0 .25rem;"><i class="fas fa-crown" style="color:#7c3aed;margin-right:.5rem;"></i>Choose Your Plan</h2>
+                        <p style="color:#6b7280;font-size:.875rem;margin:0;">Start free with 3 students. Upgrade anytime as your practice grows.</p>
+                    </div>
+
+                    <!-- Usage banner -->
+                    <div id="stuPricingUsageBanner" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(167,139,250,0.04));border:1.5px solid rgba(124,58,237,0.2);border-radius:16px;padding:1rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                        <i class="fas fa-info-circle" style="color:#7c3aed;"></i>
+                        <span id="stuPricingUsageText" style="font-size:.9rem;color:#4b5563;">Loading your current usage...</span>
+                    </div>
+
+                    <!-- Billing toggle -->
+                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:2rem;font-size:.875rem;color:#6b7280;font-weight:500;">
+                        <span>Monthly</span>
+                        <div id="stuPricingToggle" style="width:46px;height:24px;background:#7c3aed;border-radius:999px;position:relative;cursor:pointer;transition:background .2s;">
+                            <span id="stuPricingToggleKnob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left .2s;"></span>
+                        </div>
+                        <span>Yearly <span style="background:rgba(16,185,129,.12);color:#059669;border:1px solid rgba(16,185,129,.25);font-size:.7rem;font-weight:700;padding:.15rem .5rem;border-radius:999px;">Save 20%</span></span>
+                    </div>
+
+                    <!-- Plan Cards -->
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;margin-bottom:2.5rem;">
+
+                        <!-- Free -->
+                        <div style="background:#fff;border:1.5px solid rgba(124,58,237,0.12);border-radius:20px;padding:1.75rem 1.5rem;box-shadow:0 4px 20px rgba(124,58,237,0.06);transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 36px rgba(124,58,237,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(124,58,237,0.06)'">
+                            <div style="width:44px;height:44px;background:#f3f4f6;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#6b7280;margin-bottom:1rem;"><i class="fas fa-seedling"></i></div>
+                            <div style="font-size:1rem;font-weight:700;color:#1a1d29;">Free</div>
+                            <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1rem;">Get started at no cost</div>
+                            <div style="font-size:2.4rem;font-weight:800;color:#1a1d29;line-height:1;"><sup style="font-size:1rem;vertical-align:super;">$</sup>0</div>
+                            <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1.25rem;">forever free</div>
+                            <hr style="border:none;border-top:1.5px solid #f3f4f6;margin-bottom:1.25rem;">
+                            <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Up to 3 students</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Core assessments &amp; analytics</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Student progress tracking</li>
+                            </ul>
+                            <button style="width:100%;padding:.75rem;border-radius:10px;border:1.5px solid #e5e7eb;background:#f9fafb;color:#6b7280;font-weight:600;font-size:.875rem;cursor:default;">Current Plan</button>
+                        </div>
+
+                        <!-- Starter -->
+                        <div style="background:#fff;border:1.5px solid rgba(124,58,237,0.12);border-radius:20px;padding:1.75rem 1.5rem;box-shadow:0 4px 20px rgba(124,58,237,0.06);transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 36px rgba(124,58,237,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(124,58,237,0.06)'">
+                            <div style="width:44px;height:44px;background:rgba(59,130,246,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#3b82f6;margin-bottom:1rem;"><i class="fas fa-rocket"></i></div>
+                            <div style="font-size:1rem;font-weight:700;color:#1a1d29;">Starter</div>
+                            <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1rem;">For growing practices</div>
+                            <div style="font-size:2.4rem;font-weight:800;color:#1a1d29;line-height:1;" id="stu-starter-price"><sup style="font-size:1rem;vertical-align:super;">$</sup>9</div>
+                            <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1.25rem;" id="stu-starter-period">per month</div>
+                            <hr style="border:none;border-top:1.5px solid #f3f4f6;margin-bottom:1.25rem;">
+                            <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Up to 15 students</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Email support</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>PDF progress reports</li>
+                            </ul>
+                            <button onclick="stuUpgrade('starter')" style="width:100%;padding:.75rem;border-radius:10px;border:none;background:linear-gradient(135deg,#7c3aed 0%,#4c1d95 100%);color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,0.3);transition:all .2s;" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+                                Get Starter &nbsp;<i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Pro -->
+                        <div style="background:linear-gradient(155deg,#faf5ff 0%,#f3e8ff 100%);border:2px solid rgba(124,58,237,0.35);border-radius:20px;padding:1.75rem 1.5rem;box-shadow:0 8px 32px rgba(124,58,237,0.15);position:relative;transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 48px rgba(124,58,237,0.22)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 8px 32px rgba(124,58,237,0.15)'">
+                            <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#7c3aed,#a78bfa);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.28rem .9rem;border-radius:999px;">&#11088; Most Popular</div>
+                            <div style="width:44px;height:44px;background:rgba(124,58,237,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#7c3aed;margin-bottom:1rem;"><i class="fas fa-star"></i></div>
+                            <div style="font-size:1rem;font-weight:700;color:#1a1d29;">Pro</div>
+                            <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1rem;">For established consultants</div>
+                            <div style="font-size:2.4rem;font-weight:800;color:#1a1d29;line-height:1;" id="stu-pro-price"><sup style="font-size:1rem;vertical-align:super;">$</sup>19</div>
+                            <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1.25rem;" id="stu-pro-period">per month</div>
+                            <hr style="border:none;border-top:1.5px solid rgba(124,58,237,0.15);margin-bottom:1.25rem;">
+                            <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Up to 50 students</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Advanced analytics &amp; reporting</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Priority email support</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Bulk assessment tools</li>
+                            </ul>
+                            <button onclick="stuUpgrade('pro')" style="width:100%;padding:.75rem;border-radius:10px;border:none;background:linear-gradient(135deg,#7c3aed 0%,#4c1d95 100%);color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,0.35);transition:all .2s;" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+                                Get Pro &nbsp;<i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Enterprise -->
+                        <div style="background:linear-gradient(155deg,#fffbeb 0%,#fff7e6 100%);border:1.5px solid rgba(245,158,11,0.25);border-radius:20px;padding:1.75rem 1.5rem;box-shadow:0 4px 20px rgba(245,158,11,0.08);transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 36px rgba(245,158,11,0.14)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(245,158,11,0.08)'">
+                            <div style="width:44px;height:44px;background:rgba(245,158,11,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#d97706;margin-bottom:1rem;"><i class="fas fa-building"></i></div>
+                            <div style="font-size:1rem;font-weight:700;color:#1a1d29;">Enterprise</div>
+                            <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1rem;">Unlimited scale &amp; SLA</div>
+                            <div style="font-size:2.4rem;font-weight:800;color:#1a1d29;line-height:1;" id="stu-ent-price"><sup style="font-size:1rem;vertical-align:super;">$</sup>39</div>
+                            <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1.25rem;" id="stu-ent-period">per month</div>
+                            <hr style="border:none;border-top:1.5px solid rgba(245,158,11,0.2);margin-bottom:1.25rem;">
+                            <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#d97706;font-size:.72rem;margin-top:3px;"></i>Unlimited students</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#d97706;font-size:.72rem;margin-top:3px;"></i>Team access controls &amp; SCIM</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#d97706;font-size:.72rem;margin-top:3px;"></i>99.99% SLA &amp; advanced support</li>
+                                <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#d97706;font-size:.72rem;margin-top:3px;"></i>Multi-region failover</li>
+                            </ul>
+                            <button onclick="stuUpgrade('enterprise')" style="width:100%;padding:.75rem;border-radius:10px;border:1.5px solid rgba(245,158,11,.35);background:rgba(245,158,11,.1);color:#b45309;font-weight:700;font-size:.875rem;cursor:pointer;transition:all .2s;" onmouseenter="this.style.background='rgba(245,158,11,.18)'" onmouseleave="this.style.background='rgba(245,158,11,.1)'">
+                                Request Trial &nbsp;<i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                    </div><!-- /plan cards -->
+                </div><!-- /pricingSection -->
 
             </main>
         </div>
@@ -375,6 +480,138 @@
 
     <script src="js/student-profile.js"></script>
     <script src="js/consultant.js"></script>
+
+    <!-- Pricing + Subscription + Modal Logic for Students page -->
+    <script>
+      function _stuGetToken() {
+        return localStorage.getItem('token') || localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+      }
+
+      // Show/hide pricing section inline (Students page)
+      window.showPricingSection = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        // Hide student management areas, show pricing
+        var stuSection = document.getElementById('studentsSection');
+        var stuStats = document.querySelector('.students-stats-row');
+        if (stuSection) stuSection.style.display = 'none';
+        if (stuStats) stuStats.style.display = 'none';
+        var ps = document.getElementById('pricingSection');
+        if (ps) ps.style.display = 'block';
+        // Nav active state
+        document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+        var np = document.getElementById('navPricing');
+        if (np) np.classList.add('active');
+        _stuLoadPricingUsage();
+        return false;
+      };
+
+      async function _stuLoadPricingUsage() {
+        try {
+          var token = _stuGetToken();
+          if (!token) return;
+          var res = await fetch('/api/users/subscription-status', { headers: { Authorization: 'Bearer ' + token } });
+          if (!res.ok) return;
+          var data = await res.json();
+          var sub = data.subscription;
+          if (!sub) return;
+          var plans = { free:'Free Plan', starter:'Starter', pro:'Pro', enterprise:'Enterprise' };
+          var lim = sub.studentLimit >= 999999 ? 'Unlimited' : sub.studentLimit;
+          var txt = document.getElementById('stuPricingUsageText');
+          if (txt) txt.innerHTML =
+            'You are on the <strong style="color:#7c3aed;">' + (plans[sub.plan]||sub.plan) + '</strong> plan &nbsp;&middot;&nbsp; ' +
+            'Using <strong>' + sub.currentStudentCount + ' / ' + lim + '</strong> student slots.' +
+            (sub.isAtLimit && sub.plan==='free'
+              ? ' <span style="color:#ef4444;font-weight:600;">Limit reached &mdash; upgrade below.</span>' : '');
+        } catch(e) {}
+      }
+
+      // Stripe upgrade
+      window.stuUpgrade = async function(plan) {
+        if (plan === 'enterprise') { window.location.href = 'support.html'; return; }
+        var token = _stuGetToken();
+        if (!token) { window.location.href = 'index.html'; return; }
+        try {
+          var res = await fetch('/api/payments/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({ plan: plan })
+          });
+          var d = await res.json();
+          if (d.sessionUrl) { window.location.href = d.sessionUrl; }
+          else { _stuAlert('Checkout Error', d.message || 'Could not start checkout. Please try again.'); }
+        } catch(err) { _stuAlert('Error', err.message); }
+      };
+
+      // Billing toggle
+      var _stuYearly = false;
+      document.addEventListener('DOMContentLoaded', function() {
+        // Wire nav link
+        var np = document.getElementById('navPricing');
+        if (np) np.addEventListener('click', function(e){ e.preventDefault(); window.showPricingSection(e); });
+
+        // Billing toggle
+        var tog = document.getElementById('stuPricingToggle');
+        if (tog) tog.addEventListener('click', function() {
+          _stuYearly = !_stuYearly;
+          var knob = document.getElementById('stuPricingToggleKnob');
+          if (knob) knob.style.left = _stuYearly ? '25px' : '3px';
+          var prices = {starter:_stuYearly?7:9, pro:_stuYearly?15:19, ent:_stuYearly?33:39};
+          var period = _stuYearly ? 'per month, billed yearly' : 'per month';
+          ['starter','pro','ent'].forEach(function(k){
+            var pe = document.getElementById('stu-'+k+'-price');
+            var pp = document.getElementById('stu-'+k+'-period');
+            if (pe) pe.innerHTML = '<sup style="font-size:1rem;vertical-align:super;">$</sup>'+prices[k];
+            if (pp) pp.textContent = period;
+          });
+        });
+
+        // Intercept Add Student when at limit
+        setTimeout(function() {
+          var token = _stuGetToken();
+          if (!token) return;
+          fetch('/api/users/subscription-status', { headers: { Authorization: 'Bearer ' + token } })
+            .then(function(r){ return r.json(); })
+            .then(function(data) {
+              var sub = data.subscription;
+              if (!sub || !(sub.plan === 'free' && sub.isAtLimit)) return;
+              var addBtn = document.getElementById('addStudentBtn');
+              if (addBtn) addBtn.addEventListener('click', function(ev) {
+                ev.preventDefault(); ev.stopPropagation();
+                _stuConfirm(
+                  'Student Limit Reached',
+                  "You've used all 3 free student slots. Upgrade to add more students.",
+                  'fa-crown', 'View Plans', 'Not Now'
+                ).then(function(yes){ if (yes) showPricingSection(); });
+              }, true);
+            }).catch(function(){});
+        }, 1200);
+      });
+
+      // ── Custom confirm/alert modal ───────────────────────────────────────
+      function _stuConfirm(title, msg, icon, okLabel, cancelLabel) {
+        return new Promise(function(resolve) {
+          var m = document.getElementById('stuConfirmModal');
+          if (!m) { resolve(window.confirm(msg)); return; }
+          document.getElementById('stuCcmTitle').textContent  = title;
+          document.getElementById('stuCcmMsg').textContent    = msg;
+          document.getElementById('stuCcmIcon').className     = 'fas ' + (icon||'fa-crown');
+          document.getElementById('stuCcmOk').textContent     = okLabel  || 'OK';
+          var cancelEl = document.getElementById('stuCcmCancel');
+          cancelEl.textContent = cancelLabel || 'Cancel';
+          cancelEl.style.display = cancelLabel === false ? 'none' : '';
+          m.classList.add('show');
+          function done(r){ m.classList.remove('show'); resolve(r); }
+          document.getElementById('stuCcmOk').onclick     = function(){ done(true);  };
+          document.getElementById('stuCcmCancel').onclick = function(){ done(false); };
+          m.onclick = function(e){ if (e.target===m) done(false); };
+        });
+      }
+      function _stuAlert(title, msg) {
+        return _stuConfirm(title, msg, 'fa-exclamation-circle', 'OK', false);
+      }
+    </script>
+
+    <!-- Filter pills -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.stu-filter-pill').forEach(pill => {
@@ -389,6 +626,26 @@
             });
         });
     </script>
+
+    <!-- Custom Confirm Modal -->
+    <div id="stuConfirmModal" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(76,29,149,0.18);backdrop-filter:blur(8px);">
+      <div style="background:#fff;border-radius:24px;padding:2.25rem 2rem 1.75rem;max-width:380px;width:calc(100% - 2rem);box-shadow:0 24px 64px rgba(76,29,149,0.22),0 4px 16px rgba(0,0,0,0.08);border:1.5px solid rgba(124,58,237,0.15);animation:ccmPop .22s ease;text-align:center;">
+        <div style="width:60px;height:60px;border-radius:18px;margin:0 auto 1.25rem;background:linear-gradient(135deg,#ede9fe,#ddd6fe);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#7c3aed;">
+          <i id="stuCcmIcon" class="fas fa-crown"></i>
+        </div>
+        <h3 id="stuCcmTitle" style="font-size:1.15rem;font-weight:700;color:#1a1d29;margin-bottom:.5rem;"></h3>
+        <p  id="stuCcmMsg"   style="font-size:.875rem;color:#6b7280;line-height:1.65;margin-bottom:1.75rem;"></p>
+        <div style="display:flex;gap:.75rem;justify-content:center;">
+          <button id="stuCcmCancel" style="flex:1;padding:.75rem;border-radius:12px;border:1.5px solid #e5e7eb;background:#f9fafb;color:#6b7280;font-weight:600;font-size:.9rem;cursor:pointer;">Cancel</button>
+          <button id="stuCcmOk"     style="flex:1;padding:.75rem;border-radius:12px;border:none;background:linear-gradient(135deg,#7c3aed 0%,#4c1d95 100%);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,0.35);">OK</button>
+        </div>
+      </div>
+    </div>
+    <style>
+      #stuConfirmModal.show { display:flex !important; }
+      @keyframes ccmPop { from{opacity:0;transform:scale(.92) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    </style>
+
     <!-- Mobile Sidebar Toggle -->
     <script>
         (function () {
