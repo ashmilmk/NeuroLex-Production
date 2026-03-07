@@ -1241,6 +1241,75 @@
     <script src="js/student-profile.js"></script>
     <script src="js/consultant.js"></script>
 
+    <!-- Search Enhancement — robust handler independent of consultant.js timing -->
+    <script>
+    (function() {
+      var _searchTimeout = null;
+
+      function filterTableRows(q) {
+        var tbody = document.getElementById('studentTableBody');
+        if (!tbody) return;
+        var rows = tbody.querySelectorAll('tr:not(.skeleton-row)');
+        var found = 0;
+        rows.forEach(function(row) {
+          var text = row.textContent.toLowerCase();
+          var match = !q || text.indexOf(q.toLowerCase()) !== -1;
+          row.style.display = match ? '' : 'none';
+          if (match) found++;
+        });
+        // Show / hide empty state
+        var empty = document.getElementById('emptyState');
+        var container = document.getElementById('studentTableContainer');
+        if (q && found === 0) {
+          if (empty) { empty.style.display = 'flex'; empty.querySelector('p') && (empty.querySelector('p').textContent = 'No students match "' + q + '"'); }
+          if (container) container.style.display = 'none';
+        } else if (found > 0) {
+          if (empty) empty.style.display = 'none';
+          if (container) container.style.display = 'block';
+        } else if (!q) {
+          // Reset
+          if (empty) { empty.style.display = rows.length === 0 ? 'block' : 'none'; if(empty.querySelector('p')) empty.querySelector('p').textContent = 'No students yet. Add your first student!'; }
+          if (container) container.style.display = rows.length > 0 ? 'block' : 'none';
+        }
+      }
+
+      function wireSearch() {
+        var input = document.getElementById('searchInput');
+        if (!input || input._searchWired) return;
+        input._searchWired = true;
+
+        input.addEventListener('input', function() {
+          var q = this.value.trim();
+
+          // Instant client-side filter for immediate feedback
+          filterTableRows(q);
+
+          // Debounced API call for full server-side search
+          clearTimeout(_searchTimeout);
+          _searchTimeout = setTimeout(function() {
+            if (typeof loadStudents === 'function') {
+              loadStudents(q);
+            }
+          }, 350);
+        });
+
+        // Clear search on Escape
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            this.value = '';
+            filterTableRows('');
+            if (typeof loadStudents === 'function') loadStudents('');
+          }
+        });
+      }
+
+      // Try to wire immediately, and also after DOM loads (consultant.js may replace the element)
+      document.addEventListener('DOMContentLoaded', wireSearch);
+      // Retry after consultant.js's window.onload finishes
+      setTimeout(wireSearch, 800);
+    })();
+    </script>
+
     <!-- Subscription Usage Banner + Pricing Section Logic -->
     <script>
       // Helper: get auth token (consultant.js uses 'token' key)
