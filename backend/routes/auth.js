@@ -378,7 +378,7 @@ router.post('/forgot-password', [
     }
 
     const { email } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase(), role: 'teacher' });
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
       // Don't reveal whether the email exists for security
@@ -394,7 +394,7 @@ router.post('/forgot-password', [
 
     // Save to user
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    user.resetPasswordExpires = Date.now() + 300000; // 5 minutes
     await user.save({ validateBeforeSave: false });
 
     // Build reset URL
@@ -451,7 +451,7 @@ router.post('/forgot-password', [
               </a>
             </div>
             <p style="color:#9ca3af;font-size:.82rem;line-height:1.5;">
-              This link will expire in <strong>1 hour</strong>. If you didn't request this, you can safely ignore this email.
+              This link will expire in <strong>5 minutes</strong>. If you didn't request this, you can safely ignore this email.
             </p>
             <hr style="border:none;border-top:1px solid #f3f4f6;margin:1.5rem 0;">
             <p style="color:#9ca3af;font-size:.75rem;text-align:center;">
