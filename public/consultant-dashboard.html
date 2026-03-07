@@ -65,7 +65,7 @@
                     <i class="fas fa-headset"></i>
                     <span>Support</span>
                 </a>
-                <a class="nav-item" href="pricing.html" id="navPricing" style="margin-top:auto;">
+                <a class="nav-item" href="#" id="navPricing" onclick="showPricingSection(event)">
                     <i class="fas fa-crown"></i>
                     <span>Upgrade Plan</span>
                 </a>
@@ -535,6 +535,107 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- ══ Pricing Section (hidden by default) ══ -->
+                    <div id="pricingSection" style="display:none;">
+                        <div class="content-header">
+                            <h2><i class="fas fa-crown" style="color:#7c3aed;margin-right:.5rem;"></i>Choose Your Plan</h2>
+                            <p class="text-gray">Start free with 3 students. Upgrade anytime as your practice grows.</p>
+                        </div>
+
+                        <!-- Usage summary -->
+                        <div id="pricingUsageBanner" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(167,139,250,0.04));border:1.5px solid rgba(124,58,237,0.2);border-radius:16px;padding:1rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                            <i class="fas fa-info-circle" style="color:#7c3aed;"></i>
+                            <span id="pricingUsageText" style="font-size:.9rem;color:#4b5563;">Loading your current usage...</span>
+                        </div>
+
+                        <!-- Billing toggle -->
+                        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:2rem;font-size:.875rem;color:#6b7280;font-weight:500;">
+                            <span>Monthly</span>
+                            <div id="pricingToggle" style="width:46px;height:24px;background:#7c3aed;border-radius:999px;position:relative;cursor:pointer;transition:background .2s;">
+                                <span id="pricingToggleKnob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left .2s;"></span>
+                            </div>
+                            <span>Yearly <span style="background:rgba(16,185,129,.12);color:#059669;border:1px solid rgba(16,185,129,.25);font-size:.7rem;font-weight:700;padding:.15rem .5rem;border-radius:999px;">Save 20%</span></span>
+                        </div>
+
+                        <!-- Plan Cards -->
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-bottom:2.5rem;">
+
+                            <!-- Free -->
+                            <div style="background:#fff;border:1.5px solid rgba(124,58,237,0.12);border-radius:20px;padding:1.75rem 1.5rem;box-shadow:0 4px 20px rgba(124,58,237,0.06);transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 36px rgba(124,58,237,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(124,58,237,0.06)'">
+                                <div style="width:44px;height:44px;background:#f3f4f6;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#6b7280;margin-bottom:1rem;"><i class="fas fa-seedling"></i></div>
+                                <div style="font-size:1rem;font-weight:700;color:#1a1d29;">Free</div>
+                                <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1rem;">Get started at no cost</div>
+                                <div style="font-size:2.4rem;font-weight:800;color:#1a1d29;line-height:1;"><sup style="font-size:1rem;vertical-align:super;">$</sup>0</div>
+                                <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1.25rem;">forever free</div>
+                                <hr style="border:none;border-top:1.5px solid #f3f4f6;margin-bottom:1.25rem;">
+                                <ul style="list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Up to 3 students</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Core assessments &amp; analytics</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Student progress tracking</li>
+                                </ul>
+                                <button style="width:100%;padding:.75rem;border-radius:10px;border:1.5px solid #e5e7eb;background:#f9fafb;color:#6b7280;font-weight:600;font-size:.875rem;cursor:default;">Current Plan</button>
+                            </div>
+
+                            <!-- Starter -->
+                            <div style="background:#fff;border:1.5px solid rgba(124,58,237,0.12);border-radius:20px;padding:1.75rem 1.5rem;box-shadow:0 4px 20px rgba(124,58,237,0.06);transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 36px rgba(124,58,237,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(124,58,237,0.06)'">
+                                <div style="width:44px;height:44px;background:rgba(59,130,246,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#3b82f6;margin-bottom:1rem;"><i class="fas fa-rocket"></i></div>
+                                <div style="font-size:1rem;font-weight:700;color:#1a1d29;">Starter</div>
+                                <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1rem;">For growing practices</div>
+                                <div style="font-size:2.4rem;font-weight:800;color:#1a1d29;line-height:1;" id="ps-starter-price"><sup style="font-size:1rem;vertical-align:super;">$</sup>9</div>
+                                <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1.25rem;" id="ps-starter-period">per month</div>
+                                <hr style="border:none;border-top:1.5px solid #f3f4f6;margin-bottom:1.25rem;">
+                                <ul style="list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Up to 15 students</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Email support</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>PDF progress reports</li>
+                                </ul>
+                                <button onclick="dashboardUpgrade('starter')" style="width:100%;padding:.75rem;border-radius:10px;border:none;background:linear-gradient(135deg,#7c3aed 0%,#4c1d95 100%);color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,0.3);transition:all .2s;" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+                                    Get Starter &nbsp;<i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+
+                            <!-- Pro -->
+                            <div style="background:linear-gradient(155deg,#faf5ff 0%,#f3e8ff 100%);border:2px solid rgba(124,58,237,0.35);border-radius:20px;padding:1.75rem 1.5rem;box-shadow:0 8px 32px rgba(124,58,237,0.15);position:relative;transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 48px rgba(124,58,237,0.22)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 8px 32px rgba(124,58,237,0.15)'">
+                                <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#7c3aed,#a78bfa);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.28rem .9rem;border-radius:999px;">⭐ Most Popular</div>
+                                <div style="width:44px;height:44px;background:rgba(124,58,237,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#7c3aed;margin-bottom:1rem;"><i class="fas fa-star"></i></div>
+                                <div style="font-size:1rem;font-weight:700;color:#1a1d29;">Pro</div>
+                                <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1rem;">For established consultants</div>
+                                <div style="font-size:2.4rem;font-weight:800;color:#1a1d29;line-height:1;" id="ps-pro-price"><sup style="font-size:1rem;vertical-align:super;">$</sup>19</div>
+                                <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1.25rem;" id="ps-pro-period">per month</div>
+                                <hr style="border:none;border-top:1.5px solid rgba(124,58,237,0.15);margin-bottom:1.25rem;">
+                                <ul style="list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Up to 50 students</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Advanced analytics &amp; reporting</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Priority email support</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#7c3aed;font-size:.72rem;margin-top:3px;"></i>Bulk assessment tools</li>
+                                </ul>
+                                <button onclick="dashboardUpgrade('pro')" style="width:100%;padding:.75rem;border-radius:10px;border:none;background:linear-gradient(135deg,#7c3aed 0%,#4c1d95 100%);color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,0.35);transition:all .2s;" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+                                    Get Pro &nbsp;<i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+
+                            <!-- Enterprise -->
+                            <div style="background:linear-gradient(155deg,#fffbeb 0%,#fff7e6 100%);border:1.5px solid rgba(245,158,11,0.25);border-radius:20px;padding:1.75rem 1.5rem;box-shadow:0 4px 20px rgba(245,158,11,0.08);transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 36px rgba(245,158,11,0.14)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(245,158,11,0.08)'">
+                                <div style="width:44px;height:44px;background:rgba(245,158,11,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#d97706;margin-bottom:1rem;"><i class="fas fa-building"></i></div>
+                                <div style="font-size:1rem;font-weight:700;color:#1a1d29;">Enterprise</div>
+                                <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1rem;">Unlimited scale &amp; SLA</div>
+                                <div style="font-size:2.4rem;font-weight:800;color:#1a1d29;line-height:1;" id="ps-ent-price"><sup style="font-size:1rem;vertical-align:super;">$</sup>39</div>
+                                <div style="font-size:.8rem;color:#9ca3af;margin:.2rem 0 1.25rem;" id="ps-ent-period">per month</div>
+                                <hr style="border:none;border-top:1.5px solid rgba(245,158,11,0.2);margin-bottom:1.25rem;">
+                                <ul style="list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#d97706;font-size:.72rem;margin-top:3px;"></i>Unlimited students</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#d97706;font-size:.72rem;margin-top:3px;"></i>Team access controls &amp; SCIM</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#d97706;font-size:.72rem;margin-top:3px;"></i>99.99% SLA &amp; advanced support</li>
+                                    <li style="font-size:.83rem;color:#374151;display:flex;gap:.5rem;"><i class="fas fa-check" style="color:#d97706;font-size:.72rem;margin-top:3px;"></i>Multi-region failover</li>
+                                </ul>
+                                <button onclick="dashboardUpgrade('enterprise')" style="width:100%;padding:.75rem;border-radius:10px;border:1.5px solid rgba(245,158,11,.35);background:rgba(245,158,11,.1);color:#b45309;font-weight:700;font-size:.875rem;cursor:pointer;transition:all .2s;" onmouseenter="this.style.background='rgba(245,158,11,.18)'" onmouseleave="this.style.background='rgba(245,158,11,.1)'">
+                                    Request Trial &nbsp;<i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+
+                        </div><!-- /plan cards -->
+                    </div><!-- /pricingSection -->
 
                     <!-- Analytics Section (Hidden by default) -->
                     <div id="analyticsSection" style="display: none;">
@@ -1213,6 +1314,91 @@
 
         // Run after a short delay so consultant.js finishes auth check first
         setTimeout(loadSubscriptionBanner, 1200);
+
+        // ── Inline Pricing Section ─────────────────────────────────────────
+        var ALL_SECTIONS = ['dashboardMainSection','studentsSection','supportSection',
+                            'analyticsSection','resourcesSection','settingsSection','pricingSection'];
+        var ALL_NAV = ['navDashboard','navStudents','navAnalytics','navResources',
+                       'navSettings','navSupport','navPricing'];
+
+        window.showPricingSection = function(e) {
+          if (e) e.preventDefault();
+
+          // Hide all known sections
+          ALL_SECTIONS.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+          });
+          // Remove active class from all nav items
+          ALL_NAV.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+          });
+
+          // Show pricing
+          var ps = document.getElementById('pricingSection');
+          if (ps) ps.style.display = 'block';
+          var np = document.getElementById('navPricing');
+          if (np) np.classList.add('active');
+
+          // Load usage into pricing banner
+          loadPricingUsage();
+        };
+
+        async function loadPricingUsage() {
+          try {
+            var token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            if (!token) return;
+            var res = await fetch('/api/users/subscription-status', { headers: { Authorization: 'Bearer ' + token } });
+            if (!res.ok) return;
+            var data = await res.json();
+            var sub = data.subscription;
+            if (!sub) return;
+            var plans = { free:'Free Plan', starter:'Starter', pro:'Pro', enterprise:'Enterprise' };
+            var limitLabel = sub.studentLimit >= 999999 ? 'Unlimited' : sub.studentLimit;
+            var txt = document.getElementById('pricingUsageText');
+            if (txt) txt.innerHTML =
+              'You are on the <strong style="color:#7c3aed;">' + (plans[sub.plan]||sub.plan) + '</strong> plan. ' +
+              'Using <strong>' + sub.currentStudentCount + ' / ' + limitLabel + '</strong> student slots.' +
+              (sub.isAtLimit && sub.plan === 'free' ? ' <span style="color:#ef4444;font-weight:600;">Limit reached — upgrade to add more.</span>' : '');
+          } catch(e) {}
+        }
+
+        // Billing toggle for inline pricing section
+        var psIsYearly = false;
+        var psToggle = document.getElementById('pricingToggle');
+        if (psToggle) {
+          psToggle.addEventListener('click', function() {
+            psIsYearly = !psIsYearly;
+            document.getElementById('pricingToggleKnob').style.left = psIsYearly ? '25px' : '3px';
+            var prices = { starter: psIsYearly ? 7 : 9, pro: psIsYearly ? 15 : 19, ent: psIsYearly ? 33 : 39 };
+            var perLabel = psIsYearly ? 'per month, billed yearly' : 'per month';
+            [['starter','starter'],['pro','pro'],['ent','ent']].forEach(function(pair) {
+              var pe = document.getElementById('ps-'+pair[0]+'-price');
+              var pp = document.getElementById('ps-'+pair[1]+'-period');
+              if (pe) pe.innerHTML = '<sup style="font-size:1rem;vertical-align:super;">$</sup>' + prices[pair[0]];
+              if (pp) pp.textContent = perLabel;
+            });
+          });
+        }
+
+        // Stripe upgrade from inline dashboard
+        window.dashboardUpgrade = async function(plan) {
+          if (plan === 'enterprise') { window.location.href = 'support.html'; return; }
+          var token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+          if (!token) { window.location.href = '/login.html'; return; }
+          try {
+            var res = await fetch('/api/payments/create-checkout-session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+              body: JSON.stringify({ plan: plan })
+            });
+            var data = await res.json();
+            if (data.sessionUrl) window.location.href = data.sessionUrl;
+            else alert('Could not create checkout session: ' + (data.message || 'Unknown error'));
+          } catch(err) { alert('Error: ' + err.message); }
+        };
+
       })();
     </script>
 
