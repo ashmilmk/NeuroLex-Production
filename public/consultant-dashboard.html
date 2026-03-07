@@ -1241,166 +1241,160 @@
     <script src="js/student-profile.js"></script>
     <script src="js/consultant.js"></script>
 
-    <!-- Subscription Usage Banner Logic -->
+    <!-- Subscription Usage Banner + Pricing Section Logic -->
     <script>
-      (function () {
-        var PLAN_LABELS = { free: 'Free Plan', starter: 'Starter', pro: 'Pro', enterprise: 'Enterprise' };
+      // Helper: get auth token (consultant.js uses 'token' key)
+      function _getToken() {
+        return localStorage.getItem('token') ||
+               localStorage.getItem('authToken') ||
+               sessionStorage.getItem('authToken');
+      }
 
-        async function loadSubscriptionBanner() {
-          try {
-            var token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-            if (!token) return;
-
-            var res  = await fetch('/api/users/subscription-status', {
-              headers: { Authorization: 'Bearer ' + token }
-            });
-            if (!res.ok) return;
-            var data = await res.json();
-            var sub  = data.subscription;
-            if (!sub) return;
-
-            var banner  = document.getElementById('subscriptionBanner');
-            var planEl  = document.getElementById('bannerPlanName');
-            var usageEl = document.getElementById('bannerUsage');
-            var progEl  = document.getElementById('bannerProgress');
-            var upgBtn  = document.getElementById('bannerUpgradeBtn');
-
-            if (!banner) return;
-
-            // Show banner
-            banner.style.display = 'flex';
-
-            // Plan name
-            planEl.textContent = PLAN_LABELS[sub.plan] || sub.plan;
-
-            // Usage
-            var limit       = sub.studentLimit >= 999999 ? '∞' : sub.studentLimit;
-            usageEl.textContent = sub.currentStudentCount + ' / ' + limit;
-
-            // Progress bar colour
-            var pct = sub.studentLimit >= 999999 ? 20
-                    : Math.min(100, Math.round((sub.currentStudentCount / sub.studentLimit) * 100));
-            progEl.style.width = pct + '%';
-            if (pct >= 100)      progEl.style.background = 'linear-gradient(90deg,#ef4444,#f87171)';
-            else if (pct >= 75)  progEl.style.background = 'linear-gradient(90deg,#f59e0b,#fbbf24)';
-
-            // Show upgrade button when at/near limit (free plan only)
-            if (sub.plan === 'free' && sub.isAtLimit) {
-              upgBtn.style.display = 'inline-flex';
-              banner.style.borderColor = 'rgba(239,68,68,0.4)';
-              banner.style.background  = 'linear-gradient(135deg,rgba(239,68,68,0.08) 0%,rgba(124,58,237,0.06) 100%)';
-            } else if (sub.plan === 'free' && pct >= 67) {
-              upgBtn.style.display = 'inline-flex';
-            }
-
-            // Intercept addStudentBtn when at limit
-            var addBtn = document.getElementById('addStudentBtn');
-            var quickAddBtn = document.getElementById('quickActionAddStudent');
-            if (sub.plan === 'free' && sub.isAtLimit) {
-              [addBtn, quickAddBtn].forEach(function(btn) {
-                if (!btn) return;
-                btn.addEventListener('click', function(e) {
-                  e.preventDefault(); e.stopPropagation();
-                  if (confirm('You\'ve reached your 3-student limit on the Free plan.\n\nClick OK to view upgrade options.')) {
-                    window.location.href = '/pricing.html';
-                  }
-                }, true);
-              });
-            }
-          } catch(e) {
-            console.warn('Subscription banner load failed:', e);
-          }
-        }
-
-        // Run after a short delay so consultant.js finishes auth check first
-        setTimeout(loadSubscriptionBanner, 1200);
-
-        // ── Inline Pricing Section ─────────────────────────────────────────
-        var ALL_SECTIONS = ['dashboardMainSection','studentsSection','supportSection',
-                            'analyticsSection','resourcesSection','settingsSection','pricingSection'];
-        var ALL_NAV = ['navDashboard','navStudents','navAnalytics','navResources',
+      var _SECTIONS = ['dashboardMainSection','studentsSection','supportSection',
+                       'analyticsSection','resourcesSection','settingsSection','pricingSection'];
+      var _NAV_IDS  = ['navDashboard','navStudents','navAnalytics','navResources',
                        'navSettings','navSupport','navPricing'];
 
-        window.showPricingSection = function(e) {
-          if (e) e.preventDefault();
+      // Defined immediately (not inside setTimeout) so clicks always work
+      window.showPricingSection = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        _SECTIONS.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        _NAV_IDS.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.remove('active');
+        });
+        var ps = document.getElementById('pricingSection');
+        if (ps) ps.style.display = 'block';
+        var np = document.getElementById('navPricing');
+        if (np) np.classList.add('active');
+        _loadPricingUsage();
+        return false;
+      };
 
-          // Hide all known sections
-          ALL_SECTIONS.forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) el.style.display = 'none';
+      async function _loadPricingUsage() {
+        try {
+          var token = _getToken();
+          if (!token) return;
+          var res = await fetch('/api/users/subscription-status', { headers: { Authorization: 'Bearer ' + token } });
+          if (!res.ok) return;
+          var data = await res.json();
+          var sub = data.subscription;
+          if (!sub) return;
+          var plans = { free:'Free Plan', starter:'Starter', pro:'Pro', enterprise:'Enterprise' };
+          var limitLabel = sub.studentLimit >= 999999 ? 'Unlimited' : sub.studentLimit;
+          var txt = document.getElementById('pricingUsageText');
+          if (txt) txt.innerHTML =
+            'You are on the <strong style="color:#7c3aed;">' + (plans[sub.plan]||sub.plan) + '</strong> plan &nbsp;&middot;&nbsp; ' +
+            'Using <strong>' + sub.currentStudentCount + ' / ' + limitLabel + '</strong> student slots.' +
+            (sub.isAtLimit && sub.plan==='free'
+              ? ' <span style="color:#ef4444;font-weight:600;">Limit reached — upgrade below.</span>' : '');
+        } catch(e) {}
+      }
+
+      // Defined immediately so onclick in inline card buttons always works
+      window.dashboardUpgrade = async function(plan) {
+        if (plan === 'enterprise') { window.location.href = 'support.html'; return; }
+        var token = _getToken();
+        if (!token) { window.location.href = 'index.html'; return; }
+        try {
+          var res = await fetch('/api/payments/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+            body: JSON.stringify({ plan: plan })
           });
-          // Remove active class from all nav items
-          ALL_NAV.forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) el.classList.remove('active');
+          var d = await res.json();
+          if (d.sessionUrl) { window.location.href = d.sessionUrl; }
+          else { alert('Could not start checkout: ' + (d.message || 'Unknown error')); }
+        } catch(err) { alert('Error: ' + err.message); }
+      };
+
+      // Inline billing toggle
+      var _psYearly = false;
+      function _initPricingToggle() {
+        var tog = document.getElementById('pricingToggle');
+        if (!tog || tog._wired) return;
+        tog._wired = true;
+        tog.addEventListener('click', function() {
+          _psYearly = !_psYearly;
+          var knob = document.getElementById('pricingToggleKnob');
+          if (knob) knob.style.left = _psYearly ? '25px' : '3px';
+          var prices = {starter:_psYearly?7:9, pro:_psYearly?15:19, ent:_psYearly?33:39};
+          var period = _psYearly ? 'per month, billed yearly' : 'per month';
+          ['starter','pro','ent'].forEach(function(k) {
+            var pe = document.getElementById('ps-'+k+'-price');
+            var pp = document.getElementById('ps-'+k+'-period');
+            if (pe) pe.innerHTML = '<sup style="font-size:1rem;vertical-align:super;">$</sup>'+prices[k];
+            if (pp) pp.textContent = period;
           });
+        });
+      }
 
-          // Show pricing
-          var ps = document.getElementById('pricingSection');
-          if (ps) ps.style.display = 'block';
-          var np = document.getElementById('navPricing');
-          if (np) np.classList.add('active');
-
-          // Load usage into pricing banner
-          loadPricingUsage();
-        };
-
-        async function loadPricingUsage() {
-          try {
-            var token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-            if (!token) return;
-            var res = await fetch('/api/users/subscription-status', { headers: { Authorization: 'Bearer ' + token } });
-            if (!res.ok) return;
-            var data = await res.json();
-            var sub = data.subscription;
-            if (!sub) return;
-            var plans = { free:'Free Plan', starter:'Starter', pro:'Pro', enterprise:'Enterprise' };
-            var limitLabel = sub.studentLimit >= 999999 ? 'Unlimited' : sub.studentLimit;
-            var txt = document.getElementById('pricingUsageText');
-            if (txt) txt.innerHTML =
-              'You are on the <strong style="color:#7c3aed;">' + (plans[sub.plan]||sub.plan) + '</strong> plan. ' +
-              'Using <strong>' + sub.currentStudentCount + ' / ' + limitLabel + '</strong> student slots.' +
-              (sub.isAtLimit && sub.plan === 'free' ? ' <span style="color:#ef4444;font-weight:600;">Limit reached — upgrade to add more.</span>' : '');
-          } catch(e) {}
-        }
-
-        // Billing toggle for inline pricing section
-        var psIsYearly = false;
-        var psToggle = document.getElementById('pricingToggle');
-        if (psToggle) {
-          psToggle.addEventListener('click', function() {
-            psIsYearly = !psIsYearly;
-            document.getElementById('pricingToggleKnob').style.left = psIsYearly ? '25px' : '3px';
-            var prices = { starter: psIsYearly ? 7 : 9, pro: psIsYearly ? 15 : 19, ent: psIsYearly ? 33 : 39 };
-            var perLabel = psIsYearly ? 'per month, billed yearly' : 'per month';
-            [['starter','starter'],['pro','pro'],['ent','ent']].forEach(function(pair) {
-              var pe = document.getElementById('ps-'+pair[0]+'-price');
-              var pp = document.getElementById('ps-'+pair[1]+'-period');
-              if (pe) pe.innerHTML = '<sup style="font-size:1rem;vertical-align:super;">$</sup>' + prices[pair[0]];
-              if (pp) pp.textContent = perLabel;
+      // Subscription banner loader
+      async function _loadBanner() {
+        try {
+          var token = _getToken();
+          if (!token) return;
+          var res = await fetch('/api/users/subscription-status', { headers: { Authorization: 'Bearer ' + token } });
+          if (!res.ok) return;
+          var data = await res.json();
+          var sub  = data.subscription;
+          if (!sub) return;
+          var PL = {free:'Free Plan', starter:'Starter', pro:'Pro', enterprise:'Enterprise'};
+          var banner  = document.getElementById('subscriptionBanner');
+          var planEl  = document.getElementById('bannerPlanName');
+          var usageEl = document.getElementById('bannerUsage');
+          var progEl  = document.getElementById('bannerProgress');
+          var upgBtn  = document.getElementById('bannerUpgradeBtn');
+          if (!banner) return;
+          banner.style.display = 'flex';
+          if (planEl)  planEl.textContent  = PL[sub.plan] || sub.plan;
+          var limit = sub.studentLimit >= 999999 ? '\u221e' : sub.studentLimit;
+          if (usageEl) usageEl.textContent = sub.currentStudentCount + ' / ' + limit;
+          var pct = sub.studentLimit >= 999999 ? 20
+                  : Math.min(100, Math.round((sub.currentStudentCount / sub.studentLimit) * 100));
+          if (progEl) {
+            progEl.style.width = pct + '%';
+            if (pct >= 100)     progEl.style.background = 'linear-gradient(90deg,#ef4444,#f87171)';
+            else if (pct >= 75) progEl.style.background = 'linear-gradient(90deg,#f59e0b,#fbbf24)';
+          }
+          if (upgBtn && sub.plan === 'free' && (sub.isAtLimit || pct >= 67)) {
+            upgBtn.style.display = 'inline-flex';
+          }
+          if (sub.plan === 'free' && sub.isAtLimit) {
+            banner.style.borderColor = 'rgba(239,68,68,0.4)';
+            banner.style.background  = 'linear-gradient(135deg,rgba(239,68,68,0.08),rgba(124,58,237,0.06))';
+            ['addStudentBtn','quickActionAddStudent'].forEach(function(bid) {
+              var btn = document.getElementById(bid);
+              if (!btn) return;
+              btn.addEventListener('click', function(ev) {
+                ev.preventDefault(); ev.stopPropagation();
+                if (confirm('You\'ve reached your 3-student limit.\nUpgrade to add more?')) showPricingSection();
+              }, true);
             });
+          }
+        } catch(e) { console.warn('Banner load failed:', e); }
+      }
+
+      // Wire up nav link + toggle as soon as DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        // Backup listener (in addition to inline onclick)
+        var np = document.getElementById('navPricing');
+        if (np) {
+          np.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.showPricingSection(e);
           });
         }
-
-        // Stripe upgrade from inline dashboard
-        window.dashboardUpgrade = async function(plan) {
-          if (plan === 'enterprise') { window.location.href = 'support.html'; return; }
-          var token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-          if (!token) { window.location.href = '/login.html'; return; }
-          try {
-            var res = await fetch('/api/payments/create-checkout-session', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-              body: JSON.stringify({ plan: plan })
-            });
-            var data = await res.json();
-            if (data.sessionUrl) window.location.href = data.sessionUrl;
-            else alert('Could not create checkout session: ' + (data.message || 'Unknown error'));
-          } catch(err) { alert('Error: ' + err.message); }
-        };
-
-      })();
+        _initPricingToggle();
+        // Load banner after consultant.js finishes its auth check (~1s)
+        setTimeout(_loadBanner, 1200);
+      });
     </script>
+
+
 
     <!-- Mobile Sidebar Toggle -->
     <script>
