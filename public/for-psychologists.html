@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary SEO -->
+  <title>Dyslexia Assessment Tool for Psychologists | NeuroLex</title>
+  <meta name="description" content="NeuroLex is a professional AI-powered dyslexia assessment platform for psychologists and educational consultants. Conduct standardised screenings, track client progress, and generate clinical-grade reports.">
+  <meta name="keywords" content="dyslexia assessment tool psychologists, dyslexia screening for psychologists, educational psychologist dyslexia software, AI reading disorder assessment, dyslexia evaluation platform">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="apple-touch-icon" href="/images/favicon.png">
+  <link rel="canonical" href="https://neurolex.tech/for-psychologists.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://neurolex.tech/for-psychologists.html">
+  <meta property="og:title" content="Dyslexia Assessment Tool for Psychologists | NeuroLex">
+  <meta property="og:description" content="Professional AI-powered dyslexia assessment platform for psychologists. Conduct screenings, track progress, and generate clinical-grade reports.">
+    <meta property="og:image" content="https://neurolex.tech/images/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="NeuroLex">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Dyslexia Assessment Tool for Psychologists | NeuroLex">
+  <meta name="twitter:description" content="AI-powered dyslexia assessment for educational psychologists. Detect, track, and report with confidence.">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Dyslexia Assessment Tool for Psychologists",
+    "url": "https://neurolex.tech/for-psychologists.html",
+    "description": "Professional AI-powered dyslexia assessment platform designed for educational psychologists and consultants.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "NeuroLex",
+      "url": "https://neurolex.tech"
+    }
+  }
+  </script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: 'Inter', sans-serif; background: #f8faff; color: #1a1d29; }
+
+    /* ── Nav ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 60%, #3b82f6 100%);
+      box-shadow: 0 4px 20px rgba(30,64,175,0.25);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.65rem;
+      color: #fff; font-size: 1.35rem; font-weight: 700; text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: 1.25rem; }
+    .nav-links a {
+      color: rgba(255,255,255,0.85); text-decoration: none;
+      font-size: 0.9rem; font-weight: 500; transition: color .2s;
+    }
+    .nav-links a:hover { color: #fff; }
+    .btn-nav-cta {
+      background: #fff; color: #1e40af;
+      padding: 0.5rem 1.25rem; border-radius: 10px;
+      font-weight: 700; font-size: 0.9rem; text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-nav-cta:hover { background: #dbeafe; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
+      color: #fff; padding: 5rem 2rem 4rem; text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; font-size: 0.78rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 0.35rem 1rem; border-radius: 999px; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800; line-height: 1.15; margin-bottom: 1.25rem;
+    }
+    .hero h1 span { color: #93c5fd; }
+    .hero p {
+      font-size: 1.1rem; color: rgba(255,255,255,0.85);
+      max-width: 620px; margin: 0 auto 2.5rem; line-height: 1.7;
+    }
+    .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary-hero {
+      background: #fff; color: #1e40af;
+      padding: 0.9rem 2rem; border-radius: 12px;
+      font-weight: 700; font-size: 1rem; text-decoration: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transition: all .2s; display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary-hero:hover { transform: translateY(-2px); background: #dbeafe; }
+    .btn-secondary-hero {
+      background: rgba(255,255,255,0.15); color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.4);
+      padding: 0.9rem 2rem; border-radius: 12px;
+      font-weight: 600; font-size: 1rem; text-decoration: none;
+      backdrop-filter: blur(6px); transition: all .2s;
+    }
+    .btn-secondary-hero:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── Stats ── */
+    .stats-bar {
+      background: #fff; border-bottom: 1px solid #f3f4f6;
+      display: flex; justify-content: center; gap: 4rem;
+      padding: 2rem; flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 2rem; font-weight: 800; color: #1e40af; }
+    .stat-label { font-size: 0.85rem; color: #6b7280; margin-top: 0.2rem; }
+
+    /* ── Section ── */
+    section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+    .section-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      color: #1e40af; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 0.3rem 0.9rem; border-radius: 999px; margin-bottom: 1rem;
+      border: 1px solid rgba(30,64,175,0.2);
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800; color: #1a1d29; margin-bottom: 0.75rem; line-height: 1.2;
+    }
+    .section-sub { font-size: 1rem; color: #6b7280; max-width: 580px; line-height: 1.7; margin-bottom: 3rem; }
+
+    /* ── Features Grid ── */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .feature-card {
+      background: #fff; border: 1.5px solid rgba(30,64,175,0.1);
+      border-radius: 20px; padding: 2rem;
+      box-shadow: 0 4px 16px rgba(30,64,175,0.06);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(30,64,175,0.12); }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; color: #1e40af; margin-bottom: 1.25rem;
+    }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; color: #1a1d29; margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.88rem; color: #6b7280; line-height: 1.65; }
+
+    /* ── Comparison ── */
+    .comparison-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.9rem; background: #fff;
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(30,64,175,0.08);
+    }
+    .comparison-table th {
+      padding: 1rem 1.5rem; text-align: left;
+      background: linear-gradient(135deg, #1e3a5f, #1e40af); color: #fff;
+      font-weight: 700;
+    }
+    .comparison-table td { padding: 0.9rem 1.5rem; border-bottom: 1px solid #f3f4f6; color: #374151; }
+    .comparison-table tr:last-child td { border-bottom: none; }
+    .comparison-table tr:hover td { background: #f0f9ff; }
+    .check { color: #22c55e; font-weight: 700; }
+    .cross { color: #ef4444; font-weight: 700; }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: linear-gradient(135deg, #1e3a5f, #1e40af);
+      border-radius: 24px; padding: 4rem 2rem;
+      text-align: center; color: #fff; margin-bottom: 5rem;
+    }
+    .cta-section h2 { font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .cta-section p { font-size: 1rem; color: rgba(255,255,255,0.85); margin-bottom: 2rem; line-height: 1.6; }
+    .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    footer {
+      background: #1a1d29; color: rgba(255,255,255,0.6);
+      text-align: center; padding: 2rem; font-size: 0.85rem; line-height: 1.7;
+    }
+    footer a { color: #93c5fd; text-decoration: none; }
+    footer a:hover { color: #fff; }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .comparison-table { font-size: 0.8rem; }
+      .comparison-table th, .comparison-table td { padding: 0.75rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="/" class="nav-logo" id="navLogo">
+    <i class="fas fa-brain"></i> NeuroLex
+  </a>
+  <div class="nav-links">
+    <a href="/for-schools.html">For Schools</a>
+    <a href="/pricing.html">Pricing</a>
+    <a href="/blog/">Blog</a>
+    <a href="/" class="btn-nav-cta" id="navCta">Get Started Free</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-badge"><i class="fas fa-user-md"></i> Built for Psychologists</div>
+  <h1>Professional <span>Dyslexia Assessment</span><br>Platform for Psychologists</h1>
+  <p>NeuroLex gives educational psychologists and specialist consultants a powerful AI-driven assessment platform — standardised screenings, clinical-grade reports, and effortless client management all in one place.</p>
+  <div class="hero-cta">
+    <a href="/" class="btn-primary-hero" id="heroCtaStart"><i class="fas fa-rocket"></i> Start Free — No Card Needed</a>
+    <a href="/pricing.html" class="btn-secondary-hero" id="heroCtaPricing">View Pricing</a>
+  </div>
+</header>
+
+<!-- Stats Bar -->
+<div class="stats-bar" role="region" aria-label="Platform statistics">
+  <div class="stat-item">
+    <div class="stat-num">15–20</div>
+    <div class="stat-label">Minutes per full screening</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">94%</div>
+    <div class="stat-label">Screening accuracy</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">PDF</div>
+    <div class="stat-label">Instant clinical reports</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">Free</div>
+    <div class="stat-label">Start with 3 clients</div>
+  </div>
+</div>
+
+<!-- Features -->
+<section id="features" aria-labelledby="features-heading">
+  <div class="section-badge"><i class="fas fa-star"></i> Features</div>
+  <h2 class="section-title" id="features-heading">Purpose-built for<br>psychology professionals</h2>
+  <p class="section-sub">Every feature in NeuroLex is designed with psychologists in mind — from standardised assessment protocols to FERPA-compliant data handling.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-microscope"></i></div>
+      <h3>Standardised AI Assessments</h3>
+      <p>Assessments are grounded in established phonological awareness and reading fluency models. Results are reproducible and comparable across sessions.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-file-medical-alt"></i></div>
+      <h3>Clinical-Grade Reports</h3>
+      <p>Generate detailed PDF reports with risk scores, sub-skill breakdowns, reading profiles, and evidence-based intervention recommendations.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-history"></i></div>
+      <h3>Longitudinal Tracking</h3>
+      <p>Track client progress over multiple sessions. Visualise improvement trajectories and measure the impact of your interventions over time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-user-graduate"></i></div>
+      <h3>Multi-Client Management</h3>
+      <p>Manage all your clients from a single dashboard. Segment by school, age group, or risk level. Export assessment histories any time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-lock"></i></div>
+      <h3>Secure & Confidential</h3>
+      <p>All data is encrypted at rest and in transit. Role-based access controls ensure client information is only visible to you and authorised colleagues.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-comments"></i></div>
+      <h3>Parent Communication Tools</h3>
+      <p>Share accessible summary reports directly with parents, using language designed to be clear and non-alarming for non-specialist readers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison Table -->
+<section style="padding-top: 0;" aria-labelledby="compare-heading">
+  <div class="section-badge"><i class="fas fa-balance-scale"></i> Comparison</div>
+  <h2 class="section-title" id="compare-heading">NeuroLex vs Traditional Assessment</h2>
+  <p class="section-sub">See how AI-assisted dyslexia screening stands up against conventional methods.</p>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Assessment Criteria</th>
+        <th>Traditional Method</th>
+        <th>NeuroLex AI Platform</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Time per screening</td>
+        <td>2–4 hours</td>
+        <td><span class="check">✔</span> 15–20 minutes</td>
+      </tr>
+      <tr>
+        <td>Instant reports</td>
+        <td><span class="cross">✘</span> Days to weeks</td>
+        <td><span class="check">✔</span> Generated immediately</td>
+      </tr>
+      <tr>
+        <td>Progress tracking</td>
+        <td><span class="cross">✘</span> Manual comparison</td>
+        <td><span class="check">✔</span> Automatic longitudinal charts</td>
+      </tr>
+      <tr>
+        <td>Parent-friendly reports</td>
+        <td><span class="cross">✘</span> Clinical jargon</td>
+        <td><span class="check">✔</span> Plain-English summaries</td>
+      </tr>
+      <tr>
+        <td>Student experience</td>
+        <td><span class="cross">✘</span> Stressful formal testing</td>
+        <td><span class="check">✔</span> Fun, game-based format</td>
+      </tr>
+      <tr>
+        <td>Starts at</td>
+        <td>$300–$800+ per evaluation</td>
+        <td><span class="check">✔</span> Free (3 students)</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- CTA -->
+<section style="padding-top: 2rem;">
+  <div class="cta-section">
+    <h2>Expand your practice with AI-powered dyslexia assessment</h2>
+    <p>Join educational psychologists and specialist consultants on NeuroLex. Start free today and scale as your practice grows.</p>
+    <div class="cta-btns">
+      <a href="/" class="btn-primary-hero" id="ctaStart"><i class="fas fa-rocket"></i> Get Started Free</a>
+      <a href="/pricing.html" class="btn-secondary-hero" id="ctaPricing">See Pricing Plans</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>
+    <strong style="color:#fff;">NeuroLex</strong> — AI Dyslexia Assessment Platform &nbsp;|&nbsp;
+    <a href="/">Consultant Login</a> &nbsp;|&nbsp;
+    <a href="/for-schools.html">For Schools</a> &nbsp;|&nbsp;
+    <a href="/pricing.html">Pricing</a> &nbsp;|&nbsp;
+    <a href="/blog/">Blog</a>
+  </p>
+  <p style="margin-top:0.5rem;">© 2026 NeuroLex. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

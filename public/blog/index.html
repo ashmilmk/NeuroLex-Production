@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary SEO -->
+  <title>Dyslexia & Dysgraphia Research Blog | NeuroLex</title>
+  <meta name="description" content="The NeuroLex blog — expert articles on dyslexia, dysgraphia, AI-powered screening, learning disabilities, and educational support strategies for schools and psychologists.">
+  <meta name="keywords" content="dyslexia blog, dysgraphia articles, dyscalculia, dyslexia screening research, learning disability education, AI dyslexia detection, signs of dyslexia, signs of dysgraphia, what is dyscalculia">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="apple-touch-icon" href="/images/favicon.png">
+  <link rel="canonical" href="https://neurolex.tech/blog/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://neurolex.tech/blog/">
+  <meta property="og:title" content="Dyslexia & Dysgraphia Research Blog | NeuroLex">
+  <meta property="og:description" content="Expert articles on dyslexia, dysgraphia, AI screening, and educational support. Written for schools, psychologists, and parents.">
+    <meta property="og:image" content="https://neurolex.tech/images/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="NeuroLex">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "NeuroLex Dyslexia Research Blog",
+    "url": "https://neurolex.tech/blog/",
+    "description": "Expert articles on dyslexia, dysgraphia, and AI-powered learning disability screening.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "NeuroLex",
+      "url": "https://neurolex.tech"
+    }
+  }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f8faff; color: #1a1d29; }
+
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 60%, #a78bfa 100%);
+      box-shadow: 0 4px 20px rgba(76,29,149,0.25);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.65rem; color: #fff; font-size: 1.35rem; font-weight: 700; text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 1.25rem; }
+    .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: #fff; }
+    .btn-nav-cta { background: #fff; color: #7c3aed; padding: 0.5rem 1.25rem; border-radius: 10px; font-weight: 700; font-size: 0.9rem; text-decoration: none; }
+    .btn-nav-cta:hover { background: #ede9fe; }
+
+    .hero {
+      background: linear-gradient(135deg, #4c1d95, #7c3aed);
+      color: #fff; padding: 4rem 2rem 3rem; text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; font-size: 0.78rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 0.35rem 1rem; border-radius: 999px; margin-bottom: 1.25rem;
+    }
+    .hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 0.75rem; }
+    .hero p { font-size: 1rem; color: rgba(255,255,255,0.85); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+    main { max-width: 1080px; margin: 0 auto; padding: 4rem 2rem; }
+
+    .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.75rem; }
+
+    .blog-card {
+      background: #fff; border: 1.5px solid rgba(124,58,237,0.1);
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.06);
+      transition: transform .2s, box-shadow .2s;
+      display: flex; flex-direction: column;
+    }
+    .blog-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(124,58,237,0.14); }
+
+    .card-header {
+      padding: 2rem 2rem 1rem;
+      background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+    }
+    .card-tag {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 0.25rem 0.75rem; border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    .tag-dyslexia { background: rgba(124,58,237,0.12); color: #7c3aed; }
+    .tag-ai      { background: rgba(59,130,246,0.12); color: #2563eb; }
+    .tag-dysgraphia  { background: rgba(245,158,11,0.12); color: #b45309; }
+    .tag-dyscalculia { background: rgba(16,185,129,0.12);  color: #047857; }
+
+    .card-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .card-title { font-size: 1.1rem; font-weight: 700; color: #1a1d29; line-height: 1.3; }
+
+    .card-body { padding: 1.25rem 2rem 2rem; flex: 1; display: flex; flex-direction: column; }
+    .card-excerpt { font-size: 0.875rem; color: #6b7280; line-height: 1.65; margin-bottom: 1.25rem; flex: 1; }
+    .card-meta { font-size: 0.78rem; color: #9ca3af; margin-bottom: 1rem; }
+    .card-meta i { margin-right: 0.3rem; }
+    .read-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.875rem; font-weight: 700; color: #7c3aed;
+      text-decoration: none; transition: gap .2s;
+    }
+    .read-link:hover { gap: 0.7rem; }
+
+    footer {
+      background: #1a1d29; color: rgba(255,255,255,0.6);
+      text-align: center; padding: 2rem; font-size: 0.85rem; line-height: 1.7;
+    }
+    footer a { color: #a78bfa; text-decoration: none; }
+    footer a:hover { color: #fff; }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      main { padding: 2.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><i class="fas fa-brain"></i> NeuroLex</a>
+  <div class="nav-links">
+    <a href="/for-schools.html">For Schools</a>
+    <a href="/for-psychologists.html">For Psychologists</a>
+    <a href="/" class="btn-nav-cta">Get Started Free</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-badge"><i class="fas fa-book-open"></i> NeuroLex Blog</div>
+  <h1>Dyslexia, Dysgraphia &amp; AI<br>Research Articles</h1>
+  <p>Expert articles for educators, psychologists, and parents on dyslexia screening, dysgraphia support, and the science of AI-assisted learning disability detection.</p>
+</header>
+
+<main>
+  <div class="blog-grid">
+
+    <!-- Article 1 -->
+    <article class="blog-card">
+      <div class="card-header">
+        <div class="card-tag tag-dyslexia">Dyslexia</div>
+        <div class="card-icon">🧠</div>
+        <h2 class="card-title">Early Signs of Dyslexia in Children: A Complete Guide</h2>
+      </div>
+      <div class="card-body">
+        <p class="card-meta"><i class="fas fa-calendar-alt"></i> March 2026 &nbsp;·&nbsp; <i class="fas fa-clock"></i> 6 min read</p>
+        <p class="card-excerpt">Dyslexia affects 1 in 5 children, yet most cases go undetected until age 8 or later. Learn the earliest warning signs — from difficulty rhyming at age 3 to letter reversals at school — so intervention can start sooner.</p>
+        <a href="/blog/early-signs-of-dyslexia.html" class="read-link">Read Article <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </article>
+
+    <!-- Article 2 -->
+    <article class="blog-card">
+      <div class="card-header">
+        <div class="card-tag tag-ai">AI + EdTech</div>
+        <div class="card-icon">🤖</div>
+        <h2 class="card-title">How AI Can Detect Dyslexia Faster Than Traditional Testing</h2>
+      </div>
+      <div class="card-body">
+        <p class="card-meta"><i class="fas fa-calendar-alt"></i> March 2026 &nbsp;·&nbsp; <i class="fas fa-clock"></i> 7 min read</p>
+        <p class="card-excerpt">Traditional dyslexia evaluations take 4–6 hours and cost hundreds of dollars. AI-powered screening platforms like NeuroLex can achieve comparable accuracy in under 20 minutes. Here's how it works.</p>
+        <a href="/blog/how-ai-detects-dyslexia.html" class="read-link">Read Article <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </article>
+
+    <!-- Article 3 -->
+    <article class="blog-card">
+      <div class="card-header">
+        <div class="card-tag tag-dysgraphia">Dysgraphia</div>
+        <div class="card-icon">✏️</div>
+        <h2 class="card-title">Signs of Dysgraphia in Children: What Parents &amp; Teachers Should Know</h2>
+      </div>
+      <div class="card-body">
+        <p class="card-meta"><i class="fas fa-calendar-alt"></i> March 2026 &nbsp;·&nbsp; <i class="fas fa-clock"></i> 6 min read</p>
+        <p class="card-excerpt">Dysgraphia is a learning disability that affects writing — often confused with bad handwriting or laziness. Discover the key signs of dysgraphia in children and the support strategies that actually work.</p>
+        <a href="/blog/signs-of-dysgraphia-in-children.html" class="read-link">Read Article <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </article>
+
+    <!-- Article 4 -->
+    <article class="blog-card">
+      <div class="card-header">
+        <div class="card-tag tag-dyscalculia">Dyscalculia</div>
+        <div class="card-icon">🔢</div>
+        <h2 class="card-title">What is Dyscalculia? Signs, Symptoms &amp; Support Strategies</h2>
+      </div>
+      <div class="card-body">
+        <p class="card-meta"><i class="fas fa-calendar-alt"></i> March 2026 &nbsp;·&nbsp; <i class="fas fa-clock"></i> 6 min read</p>
+        <p class="card-excerpt">Dyscalculia — often called "maths dyslexia" — affects 3–7% of children yet is widely misunderstood. Learn the signs of dyscalculia, how it differs from dyslexia and dysgraphia, and which support strategies work.</p>
+        <a href="/blog/what-is-dyscalculia.html" class="read-link">Read Article <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer>
+  <p>
+    <strong style="color:#fff;">NeuroLex</strong> — AI Dyslexia Screening Platform &nbsp;|&nbsp;
+    <a href="/">Consultant Login</a> &nbsp;|&nbsp;
+    <a href="/for-schools.html">For Schools</a> &nbsp;|&nbsp;
+    <a href="/for-psychologists.html">For Psychologists</a> &nbsp;|&nbsp;
+    <a href="/pricing.html">Pricing</a>
+  </p>
+  <p style="margin-top:0.5rem;">© 2026 NeuroLex. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

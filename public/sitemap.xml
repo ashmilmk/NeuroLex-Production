@@ -1,25 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Homepage / Login -->
+  <!-- Homepage -->
   <url>
-    <loc>https://www.neurolex.tech/</loc>
+    <loc>https://neurolex.tech/</loc>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Student Login -->
+  <!-- SEO Landing Pages -->
   <url>
-    <loc>https://www.neurolex.tech/student-login.html</loc>
+    <loc>https://neurolex.tech/for-schools.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://neurolex.tech/for-psychologists.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://neurolex.tech/pricing.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Reset Password -->
+  <!-- Blog -->
   <url>
-    <loc>https://www.neurolex.tech/reset-password.html</loc>
+    <loc>https://neurolex.tech/blog/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neurolex.tech/blog/early-signs-of-dyslexia.html</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neurolex.tech/blog/how-ai-detects-dyslexia.html</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neurolex.tech/blog/signs-of-dysgraphia-in-children.html</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://neurolex.tech/blog/what-is-dyscalculia.html</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Auth Pages (low priority) -->
+  <url>
+    <loc>https://neurolex.tech/student-login.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://neurolex.tech/reset-password.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
   </url>
 
 </urlset>
